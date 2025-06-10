@@ -82,9 +82,14 @@ public class LoginController {
                     FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("admin-view.fxml"));
                     Scene scene = new Scene(loader.load());
                     app.getPrimaryStage().setScene(scene);
-                } else {
-                    // Load the user view
-                    app.getHostServices().showDocument("user-view.fxml");
+                } else if (role.equals("Siswa")){
+                    // Load the admin view
+                    app.getPrimaryStage().setTitle("Siswa View");
+
+                    // Load fxml and set the scene
+                    FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("siswa-view.fxml"));
+                    Scene scene = new Scene(loader.load());
+                    app.getPrimaryStage().setScene(scene);
                 }
             } else {
                 // Show an error message
