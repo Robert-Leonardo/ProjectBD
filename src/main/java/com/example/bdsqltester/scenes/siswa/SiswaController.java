@@ -1,30 +1,24 @@
 package com.example.bdsqltester.scenes.siswa;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-public class SiswaController {
-        @FXML
-        private Button lihatBio;
+import javafx.scene.control.Label;
 
-        @FXML
-        private Button lihatJadwal;
+    public class SiswaController {
 
-        @FXML
-        private Button lihatNilai;
+    @FXML
+    private Button BioButton;
 
-        @FXML
-        void inBio(ActionEvent event) {
+    @FXML
+    private Button JadwalButton;
 
-        }
+    @FXML
+    private Button NilaiButton;
 
-        @FXML
-        void inJadwal(ActionEvent event) {
+    @FXML
+    private Label Hilabel;
 
-        }
-
-        @FXML
-        void inNilai(ActionEvent event) {
-
-        }
-
+    public void setName(String username){
+        Hilabel.setText("Hi" + username + " !");
     }
+
+}
