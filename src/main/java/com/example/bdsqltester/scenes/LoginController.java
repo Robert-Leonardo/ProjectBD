@@ -57,7 +57,7 @@ public class LoginController {
 
     @FXML
     void initialize() {
-        selectRole.getItems().addAll("Admin", "User");
+        selectRole.getItems().addAll("Admin", "Siswa", "Guru");
         selectRole.setValue("User");
     }
 
