@@ -57,7 +57,7 @@ public class LoginController {
 
     @FXML
     void initialize() {
-        selectRole.getItems().addAll("Admin", "Siswa", "Guru");
+        selectRole.getItems().addAll("Admin", "Siswa", "Guru", "Wali kelas");
         selectRole.setValue("User");
     }
 
@@ -104,5 +104,4 @@ public class LoginController {
             throw new RuntimeException(e);
         }
     }
-
 }

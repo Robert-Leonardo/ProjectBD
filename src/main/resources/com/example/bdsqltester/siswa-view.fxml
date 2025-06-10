@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="260.0" prefWidth="482.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <AnchorPane layoutY="121.0" prefHeight="138.0" prefWidth="245.0">
+         <children>
+            <Button layoutX="14.0" layoutY="14.0" mnemonicParsing="false" prefHeight="29.0" prefWidth="193.0" text="Biodata" />
+            <Button layoutX="14.0" layoutY="54.0" mnemonicParsing="false" prefHeight="29.0" prefWidth="193.0" text="Jadwal Kelas" />
+            <Button layoutX="14.0" layoutY="94.0" mnemonicParsing="false" prefHeight="29.0" prefWidth="193.0" text="Nilai Ujian" />
+         </children>
+      </AnchorPane>
+      <Label alignment="CENTER" layoutX="7.0" layoutY="14.0" prefHeight="45.0" prefWidth="144.0" text="Hi!">
+         <font>
+            <Font name="System Bold" size="40.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>
