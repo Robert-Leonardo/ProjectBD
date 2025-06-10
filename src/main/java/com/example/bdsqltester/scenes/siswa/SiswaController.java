@@ -1,7 +1,7 @@
 package com.example.bdsqltester.scenes.siswa;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.text.Text;
 
     public class SiswaController {
 
@@ -15,10 +15,10 @@ import javafx.scene.control.Label;
     private Button NilaiButton;
 
     @FXML
-    private Label Hilabel;
+    private Text textLabel;
 
     public void setName(String username){
-        Hilabel.setText("Hi" + username + " !");
+        textLabel.setText("Hi" + username + " !");
     }
 
 }
