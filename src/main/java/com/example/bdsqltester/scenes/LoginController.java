@@ -2,6 +2,8 @@ package com.example.bdsqltester.scenes;
 
 import com.example.bdsqltester.HelloApplication;
 import com.example.bdsqltester.datasources.MainDataSource;
+import com.example.bdsqltester.scenes.guru.GuruController;
+import com.example.bdsqltester.scenes.siswa.SiswaController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -97,7 +99,7 @@ public class LoginController {
                     app.getPrimaryStage().setTitle("Siswa View");
 
                     FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("siswa-view.fxml"));
-                    Parent root = loader.load(); // Wajib load dulu
+                    Parent root = loader.load();
 
                     SiswaController controller = loader.getController();
 
@@ -124,7 +126,7 @@ public class LoginController {
 
                     // Load fxml and set the scene
                     FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("guru-view.fxml"));
-                    Parent root = loader.load(); // Wajib load dulu
+                    Parent root = loader.load();
 
                     GuruController controller = loader.getController();
 
