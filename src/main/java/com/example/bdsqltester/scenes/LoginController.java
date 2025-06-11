@@ -108,13 +108,18 @@ public class LoginController {
                     app.getPrimaryStage().setTitle("Siswa View");
 
                     // Load fxml and set the scene
-                    FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("siswa-view.fxml"));
-                    /*
-                    SiswaController siswaController = loader.getController();
-                    siswaController.setUserId(username)
-                     */
-                    Scene scene = new Scene(loader.load());
-                    app.getPrimaryStage().setScene(scene);
+                    try {
+                        FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("siswa-view.fxml"));
+                        Parent root = loader.load();
+                        SiswaController siswaController = loader.getController();
+                        siswaController.setUserId(username);
+                        Scene scene = new Scene(root);
+                        app.getPrimaryStage().setScene(scene);
+                    }
+                    catch (Exception e){
+                        e.printStackTrace();
+                    }
+
                 } else if (role.equals("Guru")){
                     app.getPrimaryStage().setTitle("Guru View");
 
