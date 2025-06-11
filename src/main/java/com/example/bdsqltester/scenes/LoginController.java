@@ -2,7 +2,6 @@ package com.example.bdsqltester.scenes;
 
 import com.example.bdsqltester.HelloApplication;
 import com.example.bdsqltester.datasources.MainDataSource;
-import com.example.bdsqltester.scenes.siswa.SiswaController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -70,7 +69,7 @@ public class LoginController {
     @FXML
     void initialize() {
         selectRole.getItems().addAll("Admin", "Siswa", "Guru", "Wali kelas");
-        selectRole.setValue("User");
+        selectRole.setValue("Siswa");
     }
 
     @FXML
@@ -95,30 +94,30 @@ public class LoginController {
                     Scene scene = new Scene(loader.load());
                     app.getPrimaryStage().setScene(scene);
                 } else if (role.equals("Siswa")){
-                    int userId = getUserIdByUsername(username);
-                    if (userId == -1) {
-                        Alert alert = new Alert(Alert.AlertType.ERROR);
-                        alert.setTitle("Login Error");
-                        alert.setHeaderText("User Not Found");
-                        alert.setContentText("Cannot find user ID in database.");
-                        alert.showAndWait();
-                        return;
-                    }
-                    // Load the admin view
                     app.getPrimaryStage().setTitle("Siswa View");
 
-                    // Load fxml and set the scene
-                    try {
-                        FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("siswa-view.fxml"));
-                        Parent root = loader.load();
-                        SiswaController siswaController = loader.getController();
-                        siswaController.setUserId(username);
-                        Scene scene = new Scene(root);
-                        app.getPrimaryStage().setScene(scene);
+                    FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("siswa-view.fxml"));
+                    Parent root = loader.load(); // Wajib load dulu
+
+                    SiswaController controller = loader.getController();
+
+                    try (Connection c = MainDataSource.getConnection()) {
+                        PreparedStatement stmt = c.prepareStatement("SELECT * FROM users WHERE username = ?");
+                        stmt.setString(1, username);
+                        ResultSet rs = stmt.executeQuery();
+
+                        if (rs.next()) {
+                            com.example.bdsqltester.dtos.User user = new com.example.bdsqltester.dtos.User(
+                                    rs.getLong("id"),
+                                    rs.getString("username"),
+                                    rs.getString("password"),
+                                    rs.getString("role")
+                            );
+                            controller.setUser(user);
+                        }
                     }
-                    catch (Exception e){
-                        e.printStackTrace();
-                    }
+
+                    app.getPrimaryStage().setScene(new Scene(root));
 
                 } else if (role.equals("Guru")){
                     app.getPrimaryStage().setTitle("Guru View");
@@ -128,6 +127,7 @@ public class LoginController {
                     Scene scene = new Scene(loader.load());
                     app.getPrimaryStage().setScene(scene);
                 }
+
 
             } else {
                 // Show an error message
