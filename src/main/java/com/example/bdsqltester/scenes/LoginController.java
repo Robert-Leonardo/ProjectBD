@@ -2,6 +2,7 @@ package com.example.bdsqltester.scenes;
 
 import com.example.bdsqltester.HelloApplication;
 import com.example.bdsqltester.datasources.MainDataSource;
+import com.example.bdsqltester.scenes.admin.AdminController;
 import com.example.bdsqltester.scenes.guru.GuruController;
 import com.example.bdsqltester.scenes.siswa.SiswaController;
 import javafx.event.ActionEvent;
@@ -93,8 +94,27 @@ public class LoginController {
 
                     // Load fxml and set the scene
                     FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("admin-view.fxml"));
-                    Scene scene = new Scene(loader.load());
-                    app.getPrimaryStage().setScene(scene);
+                    Parent root = loader.load();
+
+                    AdminController controller = loader.getController();
+
+                    try (Connection c = MainDataSource.getConnection()) {
+                        PreparedStatement stmt = c.prepareStatement("SELECT * FROM users WHERE username = ?");
+                        stmt.setString(1, username);
+                        ResultSet rs = stmt.executeQuery();
+
+                        if (rs.next()) {
+                            com.example.bdsqltester.dtos.User user = new com.example.bdsqltester.dtos.User(
+                                    rs.getLong("id"),
+                                    rs.getString("username"),
+                                    rs.getString("password"),
+                                    rs.getString("role")
+                            );
+                            controller.setUser(user);
+                        }
+                    }
+
+                    app.getPrimaryStage().setScene(new Scene(root));
                 } else if (role.equals("Siswa")){
                     app.getPrimaryStage().setTitle("Siswa View");
 
