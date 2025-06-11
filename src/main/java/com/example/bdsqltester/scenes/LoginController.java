@@ -115,7 +115,15 @@ public class LoginController {
                      */
                     Scene scene = new Scene(loader.load());
                     app.getPrimaryStage().setScene(scene);
+                } else if (role.equals("Guru")){
+                    app.getPrimaryStage().setTitle("Guru View");
+
+                    // Load fxml and set the scene
+                    FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("guru-view.fxml"));
+                    Scene scene = new Scene(loader.load());
+                    app.getPrimaryStage().setScene(scene);
                 }
+
             } else {
                 // Show an error message
                 Alert alert = new Alert(Alert.AlertType.ERROR);
