@@ -26,6 +26,18 @@ public class LoginController {
     @FXML
     private TextField usernameField;
 
+    private int getUserIdByUsername(String username) throws SQLException {
+        try (Connection c = MainDataSource.getConnection()) {
+            PreparedStatement stmt = c.prepareStatement("SELECT id FROM users WHERE username = ?");
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("id");
+            }
+        }
+        return -1;
+    }
+
     boolean verifyCredentials(String username, String password, String role) throws SQLException {
         // Call the database to verify the credentials
         // This is insecure as this stores the password in plain text.
@@ -83,14 +95,25 @@ public class LoginController {
                     Scene scene = new Scene(loader.load());
                     app.getPrimaryStage().setScene(scene);
                 } else if (role.equals("Siswa")){
+                    int userId = getUserIdByUsername(username);
+                    if (userId == -1) {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Login Error");
+                        alert.setHeaderText("User Not Found");
+                        alert.setContentText("Cannot find user ID in database.");
+                        alert.showAndWait();
+                        return;
+                    }
                     // Load the admin view
                     app.getPrimaryStage().setTitle("Siswa View");
 
                     // Load fxml and set the scene
                     FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("siswa-view.fxml"));
-                    Parent root = loader.load();
+                    /*
                     SiswaController siswaController = loader.getController();
-                    Scene scene = new Scene(root);
+                    siswaController.setUserId(username)
+                     */
+                    Scene scene = new Scene(loader.load());
                     app.getPrimaryStage().setScene(scene);
                 }
             } else {
