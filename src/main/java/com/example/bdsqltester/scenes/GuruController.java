@@ -1,38 +1,35 @@
 package com.example.bdsqltester.scenes;
+
 import com.example.bdsqltester.HelloApplication;
 import com.example.bdsqltester.dtos.User;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.text.Text;
 import javafx.scene.control.Label;
-import javafx.event.ActionEvent;
 
 import java.io.IOException;
 
-public class SiswaController {
+public class GuruController {
 
     @FXML
-    private Button BioButton;
+    private Label HiGuru;
 
     @FXML
     private Button JadwalButton;
 
     @FXML
+    private Label NameGuruLabel;
+
+    @FXML
     private Button NilaiButton;
-
-    @FXML
-    private Label nameLabel;
-
-    @FXML
-    private Text textLabel;
 
     private User user;
 
     public void setUser(User user) {
         this.user = user;
-        nameLabel.setText(user.getUsername());
+        NameGuruLabel.setText(user.getUsername());
     }
 
     @FXML
@@ -52,3 +49,4 @@ public class SiswaController {
         app.getPrimaryStage().setScene(scene);
     }
 }
+

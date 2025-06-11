@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="260.0" prefWidth="482.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.bdsqltester.scenes.guru.GuruController">
+<AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="260.0" prefWidth="482.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.bdsqltester.scenes.GuruController">
    <children>
       <AnchorPane layoutY="117.0" prefHeight="142.0" prefWidth="242.0">
          <children>
@@ -13,10 +13,16 @@
             <Button fx:id="NilaiButton" layoutX="24.0" layoutY="71.0" mnemonicParsing="false" prefHeight="29.0" prefWidth="193.0" text="Input Nilai" />
          </children>
       </AnchorPane>
-      <Label fx:id="HiGuru" alignment="CENTER" layoutX="17.0" layoutY="24.0" prefHeight="58.0" prefWidth="445.0" text="Hi Guru !">
+      <Label fx:id="HiGuru" alignment="CENTER" layoutY="7.0" prefHeight="58.0" prefWidth="77.0" text="Hi">
          <font>
             <Font name="System Bold" size="40.0" />
          </font>
       </Label>
+      <Label fx:id="NameGuruLabel" alignment="TOP_LEFT" layoutX="72.0" layoutY="7.0" prefHeight="58.0" prefWidth="236.0" text="...">
+         <font>
+            <Font name="System Bold" size="40.0" />
+         </font>
+      </Label>
+      <Button layoutX="262.0" layoutY="188.0" mnemonicParsing="false" onAction="#logOutButton" prefHeight="29.0" prefWidth="193.0" text="Log Out" />
    </children>
 </AnchorPane>

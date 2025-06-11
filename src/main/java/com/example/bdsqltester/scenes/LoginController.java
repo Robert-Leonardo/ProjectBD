@@ -124,8 +124,27 @@ public class LoginController {
 
                     // Load fxml and set the scene
                     FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("guru-view.fxml"));
-                    Scene scene = new Scene(loader.load());
-                    app.getPrimaryStage().setScene(scene);
+                    Parent root = loader.load(); // Wajib load dulu
+
+                    GuruController controller = loader.getController();
+
+                    try (Connection c = MainDataSource.getConnection()) {
+                        PreparedStatement stmt = c.prepareStatement("SELECT * FROM users WHERE username = ?");
+                        stmt.setString(1, username);
+                        ResultSet rs = stmt.executeQuery();
+
+                        if (rs.next()) {
+                            com.example.bdsqltester.dtos.User user = new com.example.bdsqltester.dtos.User(
+                                    rs.getLong("id"),
+                                    rs.getString("username"),
+                                    rs.getString("password"),
+                                    rs.getString("role")
+                            );
+                            controller.setUser(user);
+                        }
+                    }
+
+                    app.getPrimaryStage().setScene(new Scene(root));
                 }
 
 
