@@ -16,6 +16,10 @@ public class User {
         this.role = role;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
     public User(ResultSet rs) throws SQLException {
         this.id = rs.getLong("id");
         this.username = rs.getString("username");
