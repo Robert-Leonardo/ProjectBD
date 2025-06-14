@@ -5,6 +5,8 @@ import com.example.bdsqltester.datasources.MainDataSource;
 import com.example.bdsqltester.scenes.admin.AdminController;
 import com.example.bdsqltester.scenes.guru.GuruController;
 import com.example.bdsqltester.scenes.siswa.SiswaController;
+import com.example.bdsqltester.dtos.User; // Pastikan kelas User ini ada dan sesuai
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -15,6 +17,8 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 
 import java.io.IOException;
+import java.security.MessageDigest; // Diperlukan untuk MD5
+import java.security.NoSuchAlgorithmException; // Diperlukan untuk MD5
 import java.sql.*;
 
 public class LoginController {
@@ -28,45 +32,68 @@ public class LoginController {
     @FXML
     private TextField usernameField;
 
-    private int getUserIdByUsername(String username) throws SQLException {
-        try (Connection c = MainDataSource.getConnection()) {
-            PreparedStatement stmt = c.prepareStatement("SELECT id FROM users WHERE username = ?");
-            stmt.setString(1, username);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt("id");
-            }
-        }
-        return -1;
-    }
-
+    // Fungsi untuk memverifikasi kredensial berdasarkan peran yang dipilih
     boolean verifyCredentials(String username, String password, String role) throws SQLException {
-        // Call the database to verify the credentials
-        // This is insecure as this stores the password in plain text.
-        // In a real application, you should hash the password and store it securely.
+        // Hashing password input dari user
+        String hashedPassword = password; // Menggunakan fungsi MD5 yang akan kita buat
 
-        // Get a connection to the database
         try (Connection c = MainDataSource.getConnection()) {
-            // Create a prepared statement to prevent SQL injection
-            PreparedStatement stmt = c.prepareStatement("SELECT * FROM users WHERE username = ? AND role = ?");
-            stmt.setString(1, username);
-            stmt.setString(2, role.toLowerCase());
+            PreparedStatement stmt = null;
+            ResultSet rs = null;
+            String tableName = "";
+            String usernameColumn = "";
+            String passwordColumn = "";
+            String idColumn = "";
 
-            // Execute the query
-            ResultSet rs = stmt.executeQuery();
+            switch (role) {
+                case "Admin" -> {
+                    tableName = "ADMIN";
+                    usernameColumn = "username_admin";
+                    passwordColumn = "password_admin";
+                    idColumn = "id_admin";
+                }
+                case "Siswa" -> {
+                    tableName = "SISWA";
+                    usernameColumn = "nomor_induk";
+                    passwordColumn = "password"; // Kolom password di tabel SISWA
+                    idColumn = "id_siswa";
+                }
+                case "Guru", "Wali kelas" -> { // "Wali kelas" akan login melalui tabel GURU
+                    tableName = "GURU";
+                    usernameColumn = "username_guru";
+                    passwordColumn = "password_guru"; // Kolom password di tabel GURU
+                    idColumn = "id_guru";
+                }
+                default -> {
+                    return false; // Peran tidak valid
+                }
+            }
+
+            String query = "SELECT " + idColumn + ", " + passwordColumn + " FROM " + tableName + " WHERE " + usernameColumn + " = ?";
+            stmt = c.prepareStatement(query);
+            stmt.setString(1, username);
+            rs = stmt.executeQuery();
 
             if (rs.next()) {
-                // User found, check the password
-                String dbPassword = rs.getString("password");
-
-                if (dbPassword.equals(password)) {
-                    return true; // Credentials are valid
+                String dbPasswordHash = rs.getString(passwordColumn);
+                // Bandingkan password yang di-hash dari input dengan yang di-hash di DB
+                if (dbPasswordHash != null && dbPasswordHash.equals(hashedPassword)) {
+                    return true; // Kredensial valid
                 }
             }
         }
+        return false; // Kredensial tidak valid
+    }
 
-        // If we reach here, the credentials are invalid
-        return false;
+    // Fungsi MD5 sederhana (untuk tujuan proyek ini saja)
+    private String MD5(String input) throws NoSuchAlgorithmException {
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        byte[] array = md.digest(input.getBytes());
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < array.length; ++i) {
+            sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1, 3));
+        }
+        return sb.toString();
     }
 
     @FXML
@@ -77,119 +104,102 @@ public class LoginController {
 
     @FXML
     void onLoginClick(ActionEvent event) {
-        // Get the username and password from the text fields
         String username = usernameField.getText();
         String password = passwordField.getText();
         String role = selectRole.getValue();
 
-        // Verify the credentials
         try {
             if (verifyCredentials(username, password, role)) {
                 HelloApplication app = HelloApplication.getApplicationInstance();
+                long userId = -1; // Akan menyimpan id_admin, id_siswa, atau id_guru
+                String actualUsername = ""; // Akan menyimpan username_admin, nomor_induk, atau username_guru
 
-                // Load the correct view based on the role
-                switch (role) {
-                    case "Admin" -> {
-                        // Load the admin view
-                        app.getPrimaryStage().setTitle("Admin View");
+                // Dapatkan ID pengguna dari tabel yang sesuai setelah verifikasi berhasil
+                try (Connection c = MainDataSource.getConnection()) {
+                    String idColumn = "";
+                    String usernameDbColumn = ""; // Kolom username di database untuk role tersebut
+                    String tableName = "";
 
-                        // Load fxml and set the scene
-                        FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("admin-view.fxml"));
-                        Parent root = loader.load();
-
-                        AdminController controller = loader.getController();
-
-                        try (Connection c = MainDataSource.getConnection()) {
-                            PreparedStatement stmt = c.prepareStatement("SELECT * FROM users WHERE username = ?");
-                            stmt.setString(1, username);
-                            ResultSet rs = stmt.executeQuery();
-
-                            if (rs.next()) {
-                                com.example.bdsqltester.dtos.User user = new com.example.bdsqltester.dtos.User(
-                                        rs.getLong("id"),
-                                        rs.getString("username"),
-                                        rs.getString("password"),
-                                        rs.getString("role")
-                                );
-                                controller.setUser(user);
-                            }
+                    switch (role) {
+                        case "Admin" -> {
+                            tableName = "ADMIN";
+                            idColumn = "id_admin";
+                            usernameDbColumn = "username_admin";
                         }
-
-                        app.getPrimaryStage().setScene(new Scene(root));
+                        case "Siswa" -> {
+                            tableName = "SISWA";
+                            idColumn = "id_siswa";
+                            usernameDbColumn = "nomor_induk";
+                        }
+                        case "Guru", "Wali kelas" -> {
+                            tableName = "GURU";
+                            idColumn = "id_guru";
+                            usernameDbColumn = "username_guru";
+                        }
                     }
-                    case "Siswa" -> {
-                        app.getPrimaryStage().setTitle("Siswa View");
 
-                        FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("siswa-view.fxml"));
-                        Parent root = loader.load();
+                    PreparedStatement stmt = c.prepareStatement("SELECT " + idColumn + ", " + usernameDbColumn + " FROM " + tableName + " WHERE " + usernameDbColumn + " = ?");
+                    stmt.setString(1, username);
+                    ResultSet rs = stmt.executeQuery();
 
-                        SiswaController controller = loader.getController();
-
-                        try (Connection c = MainDataSource.getConnection()) {
-                            PreparedStatement stmt = c.prepareStatement("SELECT * FROM users WHERE username = ?");
-                            stmt.setString(1, username);
-                            ResultSet rs = stmt.executeQuery();
-
-                            if (rs.next()) {
-                                com.example.bdsqltester.dtos.User user = new com.example.bdsqltester.dtos.User(
-                                        rs.getLong("id"),
-                                        rs.getString("username"),
-                                        rs.getString("password"),
-                                        rs.getString("role")
-                                );
-                                controller.setUser(user);
-                            }
-                        }
-
-                        app.getPrimaryStage().setScene(new Scene(root));
-
-                    }
-                    case "Guru" -> {
-                        app.getPrimaryStage().setTitle("Guru View");
-
-                        // Load fxml and set the scene
-                        FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("guru-view.fxml"));
-                        Parent root = loader.load();
-
-                        GuruController controller = loader.getController();
-
-                        try (Connection c = MainDataSource.getConnection()) {
-                            PreparedStatement stmt = c.prepareStatement("SELECT * FROM users WHERE username = ?");
-                            stmt.setString(1, username);
-                            ResultSet rs = stmt.executeQuery();
-
-                            if (rs.next()) {
-                                com.example.bdsqltester.dtos.User user = new com.example.bdsqltester.dtos.User(
-                                        rs.getLong("id"),
-                                        rs.getString("username"),
-                                        rs.getString("password"),
-                                        rs.getString("role")
-                                );
-                                controller.setUser(user);
-                            }
-                        }
-
-                        app.getPrimaryStage().setScene(new Scene(root));
+                    if (rs.next()) {
+                        userId = rs.getLong(idColumn);
+                        actualUsername = rs.getString(usernameDbColumn);
                     }
                 }
 
+                // Jika ID pengguna berhasil ditemukan
+                if (userId != -1) {
+                    // Membuat objek User. Password tidak perlu diteruskan, cukup role dan ID/username.
+                    User loggedInUser = new User(userId, actualUsername, "", role);
+
+                    switch (role) {
+                        case "Admin" -> {
+                            app.getPrimaryStage().setTitle("Admin View");
+                            FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("admin-view.fxml"));
+                            Parent root = loader.load();
+                            AdminController controller = loader.getController();
+                            controller.setUser(loggedInUser); // Set user object to controller
+                            app.getPrimaryStage().setScene(new Scene(root));
+                        }
+                        case "Siswa" -> {
+                            app.getPrimaryStage().setTitle("Siswa View");
+                            FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("siswa-view.fxml"));
+                            Parent root = loader.load();
+                            SiswaController controller = loader.getController();
+                            controller.setUser(loggedInUser); // Set user object to controller
+                            app.getPrimaryStage().setScene(new Scene(root));
+                        }
+                        case "Guru", "Wali kelas" -> { // Keduanya menggunakan GuruController
+                            app.getPrimaryStage().setTitle("Guru View");
+                            FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("guru-view.fxml"));
+                            Parent root = loader.load();
+                            GuruController controller = loader.getController();
+                            controller.setUser(loggedInUser); // Set user object to controller
+                            app.getPrimaryStage().setScene(new Scene(root));
+                        }
+                    }
+                } else {
+                    showAlert(Alert.AlertType.ERROR, "Login Failed", "Terjadi kesalahan saat mengambil detail pengguna. ID tidak ditemukan.");
+                }
 
             } else {
-                // Show an error message
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Login Failed");
-                alert.setHeaderText("Invalid Credentials");
-                alert.setContentText("Please check your username and password.");
-                alert.showAndWait();
+                showAlert(Alert.AlertType.ERROR, "Login Failed", "Username atau password salah, atau peran tidak sesuai.");
             }
         } catch (SQLException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Database Error");
-            alert.setHeaderText("Database Connection Failed");
-            alert.setContentText("Could not connect to the database. Please try again later.");
-            alert.showAndWait();
+            showAlert(Alert.AlertType.ERROR, "Database Error", "Kesalahan koneksi database atau query: " + e.getMessage());
+            e.printStackTrace();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            showAlert(Alert.AlertType.ERROR, "Error Loading View", "Tidak dapat memuat tampilan untuk peran ini.");
+            e.printStackTrace();
         }
+    }
+
+    private void showAlert(Alert.AlertType type, String title, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 }
