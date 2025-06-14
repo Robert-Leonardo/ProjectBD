@@ -232,12 +232,11 @@ public class AdminAccController {
         if (idField.getText().isEmpty()) {
             try (Connection c = MainDataSource.getConnection()) {
                 String initialPassword = tanggalLahir.toString();
-                String hashedPassword = MD5(initialPassword);
 
                 String insertQuery = "INSERT INTO SISWA (nomor_induk, password, nama_siswa, tanggal_lahir, alamat_rumah, id_kelas) VALUES (?, ?, ?, ?, ?, ?)";
                 PreparedStatement stmt = c.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
                 stmt.setString(1, nomorInduk);
-                stmt.setString(2, hashedPassword);
+                stmt.setString(2, initialPassword);
                 stmt.setString(3, namaSiswa);
                 stmt.setDate(4, Date.valueOf(tanggalLahir));
                 stmt.setString(5, alamat);
@@ -281,19 +280,6 @@ public class AdminAccController {
         refreshSiswaList();
     }
 
-    private String MD5(String input) {
-        try {
-            java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
-            byte[] array = md.digest(input.getBytes());
-            StringBuffer sb = new StringBuffer();
-            for (int i = 0; i < array.length; ++i) {
-                sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1, 3));
-            }
-            return sb.toString();
-        } catch (java.security.NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     @FXML
     void onShowGradesClick(ActionEvent event) {
