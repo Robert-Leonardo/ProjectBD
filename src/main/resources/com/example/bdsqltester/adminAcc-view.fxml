@@ -13,14 +13,17 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
-
-<SplitPane dividerPositions="0.5" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.bdsqltester.scenes.admin.AdminAccController">
+<?import javafx.scene.control.DatePicker?> <?import javafx.scene.control.ChoiceBox?> <SplitPane dividerPositions="0.5" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.bdsqltester.scenes.admin.AdminAccController">
    <items>
       <VBox alignment="TOP_RIGHT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
          <children>
-            <Button mnemonicParsing="false" onAction="#onAddAcc" text="Add Siswa" />
-            <Button mnemonicParsing="false" onAction="#onDeleteAcc" style="-fx-background-color: Green;" text="Delete Siswa" textFill="#f1ff05" />
-            <ListView fx:id="AccountList" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="290.0">
+            <Button mnemonicParsing="false" onAction="#onAddSiswa" text="Add Siswa Baru" />
+            <Button mnemonicParsing="false" onAction="#onDeleteSiswa" style="-fx-background-color: #f44336;" text="Delete Siswa" textFill="white">
+               <VBox.margin>
+                  <Insets top="5.0" />
+               </VBox.margin>
+            </Button>
+            <ListView fx:id="siswaList" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="290.0">
                <VBox.margin>
                   <Insets top="8.0" />
                </VBox.margin>
@@ -29,49 +32,52 @@
       </VBox>
       <VBox prefHeight="200.0" prefWidth="100.0">
          <children>
-            <GridPane>
+            <GridPane hgap="10" vgap="10">
                <columnConstraints>
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="132.0" minWidth="10.0" prefWidth="48.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="225.0" minWidth="10.0" prefWidth="225.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="132.0" minWidth="10.0" prefWidth="90.0" /> <ColumnConstraints hgrow="SOMETIMES" maxWidth="225.0" minWidth="10.0" prefWidth="225.0" />
                </columnConstraints>
                <rowConstraints>
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                </rowConstraints>
                <children>
-                  <Label maxHeight="1.7976931348623157E308" text="ID" />
-                  <TextField fx:id="nameField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                  <Label maxHeight="1.7976931348623157E308" text="Name" GridPane.rowIndex="1" />
-                  <TextField fx:id="idField" GridPane.columnIndex="1" />
-               </children>
+                  <Label maxHeight="1.7976931348623157E308" text="ID Siswa:" />
+                  <TextField fx:id="idField" GridPane.columnIndex="1" /> <Label text="Nomor Induk:" GridPane.rowIndex="1" />
+                  <TextField fx:id="nomorIndukField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                  <Label text="Nama Siswa:" GridPane.rowIndex="2" />
+                  <TextField fx:id="namaSiswaField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                  <Label text="Tanggal Lahir:" GridPane.rowIndex="3" />
+                  <DatePicker fx:id="tanggalLahirPicker" GridPane.columnIndex="1" GridPane.rowIndex="3" prefWidth="Infinity" /> <Label text="Alamat:" GridPane.rowIndex="4" />
+                  <TextField fx:id="alamatField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+                  <Label text="Kelas:" GridPane.rowIndex="5" />
+                  <ChoiceBox fx:id="kelasChoiceBox" prefWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="5" /> </children>
             </GridPane>
-            <HBox prefWidth="200.0" spacing="8.0" />
-            <Label text="Instructions">
-               <padding>
-                  <Insets top="8.0" />
-               </padding>
-            </Label>
-            <TextArea fx:id="instructionsField" prefHeight="77.0" prefWidth="273.0" />
-            <Label text="Answer Key (SQL)">
-               <padding>
-                  <Insets top="8.0" />
-               </padding>
-            </Label>
-            <TextArea fx:id="answerKeyField" prefHeight="77.0" prefWidth="273.0" />
-            <HBox alignment="CENTER_RIGHT" spacing="8.0">
+            <HBox alignment="CENTER_RIGHT" prefWidth="200.0" spacing="8.0">
                <VBox.margin>
-                  <Insets top="8.0" />
-               </VBox.margin>
+                  <Insets top="15.0" /> </VBox.margin>
                <children>
-                  <HBox HBox.hgrow="ALWAYS">
-                     <children>
-                        <Button mnemonicParsing="false" onAction="#onShowGradesClick" text="Show Grades" />
-                     </children></HBox>
-                  <Button mnemonicParsing="false" onAction="#onTestButtonClick" text="Test" />
-                  <Button mnemonicParsing="false" onAction="#onSaveClick" text="Save" />
-               </children>
+                  <Button mnemonicParsing="false" onAction="#onShowGradesClick" text="Lihat Nilai" />
+                  <Button mnemonicParsing="false" onAction="#onTestButtonClick" text="Test Query" />
+                  <Button mnemonicParsing="false" onAction="#onSaveSiswa" text="Simpan Siswa" style="-fx-background-color: #4CAF50;" textFill="white" /> </children>
             </HBox>
-            <AnchorPane prefHeight="25.0" prefWidth="273.0" />
+            <Label text="Catatan Admin (Opsional)">
+               <padding>
+                  <Insets top="8.0" />
+               </padding>
+            </Label>
+            <TextArea fx:id="notesField" prefHeight="77.0" prefWidth="273.0" /> <Label text="Query Pengujian SQL (Opsional)">
+            <padding>
+               <Insets top="8.0" />
+            </padding>
+         </Label>
+            <TextArea fx:id="queryTestField" prefHeight="77.0" prefWidth="273.0" /> <AnchorPane prefHeight="25.0" prefWidth="273.0" />
             <AnchorPane prefHeight="66.0" prefWidth="273.0">
                <children>
                   <Button layoutX="197.0" layoutY="32.0" mnemonicParsing="false" onAction="#BackButton" prefHeight="30.0" prefWidth="62.0" text="Back" />
