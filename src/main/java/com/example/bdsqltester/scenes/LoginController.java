@@ -88,85 +88,89 @@ public class LoginController {
                 HelloApplication app = HelloApplication.getApplicationInstance();
 
                 // Load the correct view based on the role
-                if (role.equals("Admin")) {
-                    // Load the admin view
-                    app.getPrimaryStage().setTitle("Admin View");
+                switch (role) {
+                    case "Admin" -> {
+                        // Load the admin view
+                        app.getPrimaryStage().setTitle("Admin View");
 
-                    // Load fxml and set the scene
-                    FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("admin-view.fxml"));
-                    Parent root = loader.load();
+                        // Load fxml and set the scene
+                        FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("admin-view.fxml"));
+                        Parent root = loader.load();
 
-                    AdminController controller = loader.getController();
+                        AdminController controller = loader.getController();
 
-                    try (Connection c = MainDataSource.getConnection()) {
-                        PreparedStatement stmt = c.prepareStatement("SELECT * FROM users WHERE username = ?");
-                        stmt.setString(1, username);
-                        ResultSet rs = stmt.executeQuery();
+                        try (Connection c = MainDataSource.getConnection()) {
+                            PreparedStatement stmt = c.prepareStatement("SELECT * FROM users WHERE username = ?");
+                            stmt.setString(1, username);
+                            ResultSet rs = stmt.executeQuery();
 
-                        if (rs.next()) {
-                            com.example.bdsqltester.dtos.User user = new com.example.bdsqltester.dtos.User(
-                                    rs.getLong("id"),
-                                    rs.getString("username"),
-                                    rs.getString("password"),
-                                    rs.getString("role")
-                            );
-                            controller.setUser(user);
+                            if (rs.next()) {
+                                com.example.bdsqltester.dtos.User user = new com.example.bdsqltester.dtos.User(
+                                        rs.getLong("id"),
+                                        rs.getString("username"),
+                                        rs.getString("password"),
+                                        rs.getString("role")
+                                );
+                                controller.setUser(user);
+                            }
                         }
+
+                        app.getPrimaryStage().setScene(new Scene(root));
                     }
+                    case "Siswa" -> {
+                        app.getPrimaryStage().setTitle("Siswa View");
 
-                    app.getPrimaryStage().setScene(new Scene(root));
-                } else if (role.equals("Siswa")){
-                    app.getPrimaryStage().setTitle("Siswa View");
+                        FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("siswa-view.fxml"));
+                        Parent root = loader.load();
 
-                    FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("siswa-view.fxml"));
-                    Parent root = loader.load();
+                        SiswaController controller = loader.getController();
 
-                    SiswaController controller = loader.getController();
+                        try (Connection c = MainDataSource.getConnection()) {
+                            PreparedStatement stmt = c.prepareStatement("SELECT * FROM users WHERE username = ?");
+                            stmt.setString(1, username);
+                            ResultSet rs = stmt.executeQuery();
 
-                    try (Connection c = MainDataSource.getConnection()) {
-                        PreparedStatement stmt = c.prepareStatement("SELECT * FROM users WHERE username = ?");
-                        stmt.setString(1, username);
-                        ResultSet rs = stmt.executeQuery();
-
-                        if (rs.next()) {
-                            com.example.bdsqltester.dtos.User user = new com.example.bdsqltester.dtos.User(
-                                    rs.getLong("id"),
-                                    rs.getString("username"),
-                                    rs.getString("password"),
-                                    rs.getString("role")
-                            );
-                            controller.setUser(user);
+                            if (rs.next()) {
+                                com.example.bdsqltester.dtos.User user = new com.example.bdsqltester.dtos.User(
+                                        rs.getLong("id"),
+                                        rs.getString("username"),
+                                        rs.getString("password"),
+                                        rs.getString("role")
+                                );
+                                controller.setUser(user);
+                            }
                         }
+
+                        app.getPrimaryStage().setScene(new Scene(root));
+
                     }
+                    case "Guru" -> {
+                        app.getPrimaryStage().setTitle("Guru View");
 
-                    app.getPrimaryStage().setScene(new Scene(root));
+                        // Load fxml and set the scene
+                        FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("guru-view.fxml"));
+                        Parent root = loader.load();
 
-                } else if (role.equals("Guru")){
-                    app.getPrimaryStage().setTitle("Guru View");
+                        GuruController controller = loader.getController();
 
-                    // Load fxml and set the scene
-                    FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("guru-view.fxml"));
-                    Parent root = loader.load();
+                        try (Connection c = MainDataSource.getConnection()) {
+                            PreparedStatement stmt = c.prepareStatement("SELECT * FROM users WHERE username = ?");
+                            stmt.setString(1, username);
+                            ResultSet rs = stmt.executeQuery();
 
-                    GuruController controller = loader.getController();
-
-                    try (Connection c = MainDataSource.getConnection()) {
-                        PreparedStatement stmt = c.prepareStatement("SELECT * FROM users WHERE username = ?");
-                        stmt.setString(1, username);
-                        ResultSet rs = stmt.executeQuery();
-
-                        if (rs.next()) {
-                            com.example.bdsqltester.dtos.User user = new com.example.bdsqltester.dtos.User(
-                                    rs.getLong("id"),
-                                    rs.getString("username"),
-                                    rs.getString("password"),
-                                    rs.getString("role")
-                            );
-                            controller.setUser(user);
+                            if (rs.next()) {
+                                com.example.bdsqltester.dtos.User user = new com.example.bdsqltester.dtos.User(
+                                        rs.getLong("id"),
+                                        rs.getString("username"),
+                                        rs.getString("password"),
+                                        rs.getString("role")
+                                );
+                                controller.setUser(user);
+                            }
                         }
-                    }
 
-                    app.getPrimaryStage().setScene(new Scene(root));
+                        app.getPrimaryStage().setScene(new Scene(root));
+                    }
                 }
 
 
