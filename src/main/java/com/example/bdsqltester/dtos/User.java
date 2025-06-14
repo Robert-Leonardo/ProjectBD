@@ -1,29 +1,32 @@
 package com.example.bdsqltester.dtos;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 public class User {
-    public long id;
-    public String username;
-    public String password;
-    public String role;
+    private long id; // Pastikan ini long
+    private String username;
+    private String password;
+    private String role; // Pastikan ini String
 
-    public User(long id, String name, String password, String role) {
+    public User(long id, String username, String password, String role) {
         this.id = id;
-        this.username = name;
+        this.username = username;
         this.password = password;
         this.role = role;
+    }
+
+    public long getId() { // Ini yang diperlukan
+        return id;
     }
 
     public String getUsername() {
         return username;
     }
 
-    public User(ResultSet rs) throws SQLException {
-        this.id = rs.getLong("id");
-        this.username = rs.getString("username");
-        this.password = rs.getString("password");
-        this.role = rs.getString("role");
+    public String getPassword() {
+        return password;
     }
+
+    public String getRole() { // Ini yang diperlukan
+        return role;
+    }
+    // ... (setter jika ada)
 }

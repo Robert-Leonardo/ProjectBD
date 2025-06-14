@@ -99,7 +99,7 @@ public class LoginController {
     @FXML
     void initialize() {
         selectRole.getItems().addAll("Admin", "Siswa", "Guru", "Wali kelas");
-        selectRole.setValue("Siswa");
+        selectRole.setValue("Admin");
     }
 
     @FXML
