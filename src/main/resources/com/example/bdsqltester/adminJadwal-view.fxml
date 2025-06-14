@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Spinner?>
+
+<SplitPane dividerPositions="0.5" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.bdsqltester.scenes.admin.AdminJadwalController">
+    <items>
+        <VBox alignment="TOP_RIGHT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="250.0">
+            <children>
+                <Button mnemonicParsing="false" onAction="#onAddJadwal" text="Tambah Jadwal Baru" />
+                <Button mnemonicParsing="false" onAction="#onDeleteJadwal" style="-fx-background-color: #f44336;" text="Hapus Jadwal" textFill="white">
+                    <VBox.margin>
+                        <Insets top="5.0" />
+                    </VBox.margin>
+                </Button>
+                <ListView fx:id="jadwalList" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="240.0">
+                    <VBox.margin>
+                        <Insets top="8.0" />
+                    </VBox.margin>
+                </ListView>
+            </children>
+        </VBox>
+        <VBox prefHeight="200.0" prefWidth="100.0">
+            <children>
+                <GridPane hgap="10" vgap="10">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="132.0" minWidth="10.0" prefWidth="90.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="225.0" minWidth="10.0" prefWidth="225.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                    <children>
+                        <Label text="ID Jadwal:" />
+                        <TextField fx:id="idJadwalField" editable="false" focusTraversable="false" mouseTransparent="true" GridPane.columnIndex="1" />
+
+                        <Label text="Kelas:" GridPane.rowIndex="1" />
+                        <ChoiceBox fx:id="kelasChoiceBox" prefWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                        <Label text="Mata Pelajaran:" GridPane.rowIndex="2" />
+                        <ChoiceBox fx:id="mapelChoiceBox" prefWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                        <Label text="Guru Pengajar:" GridPane.rowIndex="3" />
+                        <ChoiceBox fx:id="guruChoiceBox" prefWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                        <Label text="Hari:" GridPane.rowIndex="4" />
+                        <ChoiceBox fx:id="hariChoiceBox" prefWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+                        <Label text="Jam Mulai:" GridPane.rowIndex="5" />
+                        <Spinner fx:id="jamMulaiSpinner" editable="true" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+
+                        <Label text="Jam Selesai:" GridPane.rowIndex="6" />
+                        <Spinner fx:id="jamSelesaiSpinner" editable="true" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                    </children>
+                </GridPane>
+                <HBox alignment="CENTER_RIGHT" prefWidth="200.0" spacing="8.0">
+                    <VBox.margin>
+                        <Insets top="15.0" />
+                    </VBox.margin>
+                    <children>
+                        <Button mnemonicParsing="false" onAction="#onSaveJadwal" text="Simpan Jadwal" style="-fx-background-color: #4CAF50;" textFill="white" />
+                    </children>
+                </HBox>
+                <HBox alignment="BOTTOM_RIGHT" layoutX="18.0" layoutY="210.0" prefHeight="66.0" prefWidth="362.0">
+                    <children>
+                        <Button mnemonicParsing="false" onAction="#BackButton" prefHeight="30.0" prefWidth="62.0" text="Back" />
+                    </children>
+                    <padding>
+                        <Insets bottom="8.0" right="8.0" />
+                    </padding>
+                </HBox>
+            </children>
+            <padding>
+                <Insets left="8.0" right="8.0" />
+            </padding>
+        </VBox>
+    </items>
+    <padding>
+        <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+    </padding>
+</SplitPane>
