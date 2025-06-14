@@ -161,7 +161,7 @@ public class AdminJadwalController {
                     "JOIN KELAS k ON j.id_kelas = k.id_kelas " +
                     "JOIN MATA_PELAJARAN mp ON j.id_pelajaran = mp.id_pelajaran " +
                     "JOIN GURU g ON j.id_guru = g.id_guru " +
-                    "ORDER BY FIELD(j.hari, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'), j.jam_mulai, k.nama_kelas"; // Mengurutkan berdasarkan hari dan jam
+                    "ORDER BY    ARRAY_POSITION(ARRAY['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'], j.hari),j.jam_mulai,k.nama_kelas";
             Statement stmt = c.createStatement();
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
