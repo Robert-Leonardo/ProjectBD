@@ -1,5 +1,6 @@
 package com.example.bdsqltester.scenes.admin;
 
+import com.example.bdsqltester.HelloApplication;
 import com.example.bdsqltester.datasources.GradingDataSource;
 import com.example.bdsqltester.datasources.MainDataSource;
 import com.example.bdsqltester.dtos.Assignment;
@@ -8,11 +9,13 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -338,4 +341,15 @@ public class AdminAccController {
     } // End of onTestButtonClick method
 
 
+    @FXML
+    void BackButton(ActionEvent event) throws Exception {
+            HelloApplication app = HelloApplication.getApplicationInstance();
+            // Load the admin view
+            app.getPrimaryStage().setTitle("Admin View");
+
+            // Load fxml and set the scene
+            FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("admin-view.fxml"));
+            Scene scene = new Scene(loader.load());
+            app.getPrimaryStage().setScene(scene);
+    }
 }

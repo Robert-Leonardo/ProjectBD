@@ -7,6 +7,7 @@
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
@@ -17,9 +18,9 @@
    <items>
       <VBox alignment="TOP_RIGHT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
          <children>
-            <Button mnemonicParsing="false" onAction="#onAddAcc" text="Add Account" />
-            <Button mnemonicParsing="false" onAction="#onDeleteAcc" style="-fx-background-color: Green;" text="Delete Account" textFill="#f1ff05" />
-            <ListView fx:id="AccountList" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+            <Button mnemonicParsing="false" onAction="#onAddAcc" text="Add Siswa" />
+            <Button mnemonicParsing="false" onAction="#onDeleteAcc" style="-fx-background-color: Green;" text="Delete Siswa" textFill="#f1ff05" />
+            <ListView fx:id="AccountList" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="290.0">
                <VBox.margin>
                   <Insets top="8.0" />
                </VBox.margin>
@@ -62,12 +63,20 @@
                   <Insets top="8.0" />
                </VBox.margin>
                <children>
-                  <Button mnemonicParsing="false" onAction="#onShowGradesClick" text="Show Grades" />
-                  <HBox HBox.hgrow="ALWAYS" />
+                  <HBox HBox.hgrow="ALWAYS">
+                     <children>
+                        <Button mnemonicParsing="false" onAction="#onShowGradesClick" text="Show Grades" />
+                     </children></HBox>
                   <Button mnemonicParsing="false" onAction="#onTestButtonClick" text="Test" />
                   <Button mnemonicParsing="false" onAction="#onSaveClick" text="Save" />
                </children>
             </HBox>
+            <AnchorPane prefHeight="25.0" prefWidth="273.0" />
+            <AnchorPane prefHeight="66.0" prefWidth="273.0">
+               <children>
+                  <Button layoutX="197.0" layoutY="32.0" mnemonicParsing="false" onAction="#BackButton" prefHeight="30.0" prefWidth="62.0" text="Back" />
+               </children>
+            </AnchorPane>
          </children>
          <padding>
             <Insets left="8.0" right="8.0" />
