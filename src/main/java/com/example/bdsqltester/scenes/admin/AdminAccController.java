@@ -3,16 +3,19 @@ package com.example.bdsqltester.scenes.admin;
 import com.example.bdsqltester.HelloApplication;
 import com.example.bdsqltester.datasources.MainDataSource;
 import com.example.bdsqltester.dtos.Siswa;
+import com.example.bdsqltester.dtos.User;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox; // Import VBox if needed for UI elements within FXML
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -24,7 +27,6 @@ import java.util.Map;
 
 public class AdminAccController {
 
-    // ... (Your other FXML fields and ObservableList) ...
     @FXML private TextField idField;
     @FXML private TextField nomorIndukField;
     @FXML private TextField namaSiswaField;
@@ -32,15 +34,19 @@ public class AdminAccController {
     @FXML private TextField alamatField;
     @FXML private ChoiceBox<String> kelasChoiceBox;
     @FXML private ListView<Siswa> siswaList;
-    @FXML private TextArea notesField; // Assuming you renamed instructionsField
-    @FXML private TextArea queryTestField; // Assuming you renamed answerKeyField
+    @FXML private TextArea notesField;
+    @FXML private TextArea queryTestField;
 
     private final ObservableList<Siswa> siswas = FXCollections.observableArrayList();
     private Map<String, Long> kelasMap = new HashMap<>();
+    private User currentUser;
+
+    public void setUser(User user) {
+        this.currentUser = user;
+    }
 
     @FXML
     void initialize() {
-        // ... (Your existing initialize logic) ...
         idField.setEditable(false);
         idField.setMouseTransparent(true);
         idField.setFocusTraversable(false);
@@ -167,10 +173,10 @@ public class AdminAccController {
         confirmationAlert.setContentText("Tindakan ini tidak dapat dibatalkan. Menghapus siswa juga akan menghapus nilai, absensi, dan prestasi terkait.");
         confirmationAlert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
-                Connection conn = null; // Deklarasikan conn di sini agar scope-nya luas
+                Connection conn = null;
                 try {
-                    conn = MainDataSource.getConnection(); // Inisialisasi di dalam try
-                    conn.setAutoCommit(false); // Matikan autocommit
+                    conn = MainDataSource.getConnection();
+                    conn.setAutoCommit(false);
 
                     deleteRelatedData(conn, "NILAI", "id_siswa", siswaId);
                     deleteRelatedData(conn, "ABSENSI_SISWA", "id_siswa", siswaId);
@@ -181,7 +187,7 @@ public class AdminAccController {
                     stmt.setLong(1, siswaId);
                     stmt.executeUpdate();
 
-                    conn.commit(); // Commit transaksi jika semua berhasil
+                    conn.commit();
                     refreshSiswaList();
                     onSiswaSelected(null);
 
@@ -189,7 +195,7 @@ public class AdminAccController {
 
                 } catch (SQLException e) {
                     try {
-                        if (conn != null) conn.rollback(); // Akses conn yang sudah dideklarasikan
+                        if (conn != null) conn.rollback();
                     } catch (SQLException ex) {
                         ex.printStackTrace();
                     }
@@ -197,8 +203,8 @@ public class AdminAccController {
                     e.printStackTrace();
                 } finally {
                     try {
-                        if (conn != null) conn.setAutoCommit(true); // Akses conn yang sudah dideklarasikan
-                        if (conn != null) conn.close(); // Penting: Tutup koneksi di sini
+                        if (conn != null) conn.setAutoCommit(true);
+                        if (conn != null) conn.close();
                     } catch (SQLException ex) {
                         ex.printStackTrace();
                     }
@@ -231,12 +237,12 @@ public class AdminAccController {
 
         if (idField.getText().isEmpty()) {
             try (Connection c = MainDataSource.getConnection()) {
-                String initialPassword = tanggalLahir.toString();
+                String initialPasswordPlain = tanggalLahir.toString();
 
                 String insertQuery = "INSERT INTO SISWA (nomor_induk, password, nama_siswa, tanggal_lahir, alamat_rumah, id_kelas) VALUES (?, ?, ?, ?, ?, ?)";
                 PreparedStatement stmt = c.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
                 stmt.setString(1, nomorInduk);
-                stmt.setString(2, initialPassword);
+                stmt.setString(2, initialPasswordPlain);
                 stmt.setString(3, namaSiswa);
                 stmt.setDate(4, Date.valueOf(tanggalLahir));
                 stmt.setString(5, alamat);
@@ -298,12 +304,11 @@ public class AdminAccController {
         ObservableList<ArrayList<String>> data = FXCollections.observableArrayList();
         ArrayList<String> headers = new ArrayList<>();
 
-        // Menggunakan queryTestField untuk query
-        String query = queryTestField.getText(); // Pastikan fx:id di FXML sudah diganti
+        String query = queryTestField.getText();
 
         try (Connection conn = MainDataSource.getConnection();
              Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(query)) { // Gunakan 'query' di sini
+             ResultSet rs = stmt.executeQuery(query)) {
 
             ResultSetMetaData metaData = rs.getMetaData();
             int columnCount = metaData.getColumnCount();
@@ -361,7 +366,12 @@ public class AdminAccController {
         HelloApplication app = HelloApplication.getApplicationInstance();
         app.getPrimaryStage().setTitle("Admin View");
         FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("admin-view.fxml"));
-        Scene scene = new Scene(loader.load());
+        Parent root = loader.load();
+        AdminController adminController = loader.getController();
+        if (currentUser != null) {
+            adminController.setUser(currentUser);
+        }
+        Scene scene = new Scene(root);
         app.getPrimaryStage().setScene(scene);
     }
 

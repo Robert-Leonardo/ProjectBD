@@ -3,11 +3,13 @@ package com.example.bdsqltester.scenes.admin;
 import com.example.bdsqltester.HelloApplication;
 import com.example.bdsqltester.datasources.MainDataSource;
 import com.example.bdsqltester.dtos.Jadwal;
+import com.example.bdsqltester.dtos.User; // Import DTO User
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.util.StringConverter;
@@ -35,21 +37,28 @@ public class AdminJadwalController {
     private Map<String, Long> mapelMap = new HashMap<>();
     private Map<String, Long> guruMap = new HashMap<>();
 
+    private User currentUser; // Menambahkan field untuk menyimpan user yang login
+
+    // Metode untuk menerima objek User dari controller sebelumnya
+    public void setUser(User user) {
+        this.currentUser = user;
+        // Tidak ada UI yang perlu diupdate di AdminJadwalController dari data user
+        // tapi data ini penting saat kembali ke AdminController
+    }
+
     @FXML
     void initialize() {
         idJadwalField.setEditable(false);
         idJadwalField.setMouseTransparent(true);
         idJadwalField.setFocusTraversable(false);
 
-        // Inisialisasi ChoiceBox Hari
         hariChoiceBox.getItems().addAll("Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu");
 
-        // Inisialisasi Spinner untuk Jam Mulai dan Jam Selesai
         setupTimeSpinner(jamMulaiSpinner);
         setupTimeSpinner(jamSelesaiSpinner);
 
         refreshJadwalList();
-        loadDropdownData(); // Muat data untuk ChoiceBox lainnya
+        loadDropdownData();
 
         jadwalList.setCellFactory(param -> new ListCell<Jadwal>() {
             @Override
@@ -90,7 +99,7 @@ public class AdminJadwalController {
             public void decrement(int steps) {
                 LocalTime current = getValue();
                 if (current != null) {
-                    setValue(current.minusMinutes(steps * 15)); // Decrement by 15 minutes
+                    setValue(current.minusMinutes(steps * 15));
                 }
             }
 
@@ -98,12 +107,12 @@ public class AdminJadwalController {
             public void increment(int steps) {
                 LocalTime current = getValue();
                 if (current != null) {
-                    setValue(current.plusMinutes(steps * 15)); // Increment by 15 minutes
+                    setValue(current.plusMinutes(steps * 15));
                 }
             }
         };
         spinner.setValueFactory(valueFactory);
-        spinner.getValueFactory().setValue(LocalTime.of(8, 0)); // Default value
+        spinner.getValueFactory().setValue(LocalTime.of(8, 0));
     }
 
 
@@ -116,7 +125,6 @@ public class AdminJadwalController {
         guruChoiceBox.getItems().clear();
 
         try (Connection c = MainDataSource.getConnection()) {
-            // Load Kelas
             Statement stmtKelas = c.createStatement();
             ResultSet rsKelas = stmtKelas.executeQuery("SELECT id_kelas, nama_kelas FROM KELAS ORDER BY nama_kelas");
             while (rsKelas.next()) {
@@ -126,7 +134,6 @@ public class AdminJadwalController {
                 kelasChoiceBox.getItems().add(nama);
             }
 
-            // Load Mata Pelajaran
             Statement stmtMapel = c.createStatement();
             ResultSet rsMapel = stmtMapel.executeQuery("SELECT id_pelajaran, nama_pelajaran FROM MATA_PELAJARAN ORDER BY nama_pelajaran");
             while (rsMapel.next()) {
@@ -136,7 +143,6 @@ public class AdminJadwalController {
                 mapelChoiceBox.getItems().add(nama);
             }
 
-            // Load Guru
             Statement stmtGuru = c.createStatement();
             ResultSet rsGuru = stmtGuru.executeQuery("SELECT id_guru, nama_guru FROM GURU ORDER BY nama_guru");
             while (rsGuru.next()) {
@@ -172,7 +178,6 @@ public class AdminJadwalController {
             e.printStackTrace();
         }
         jadwalList.setItems(jadwals);
-        // Coba pilih jadwal yang terakhir dipilih atau baru ditambahkan
         try {
             if (!idJadwalField.getText().isEmpty()) {
                 long id = Long.parseLong(idJadwalField.getText());
@@ -255,7 +260,6 @@ public class AdminJadwalController {
 
     @FXML
     void onSaveJadwal(ActionEvent event) {
-        // Ambil data dari form
         String selectedKelas = kelasChoiceBox.getValue();
         String selectedMapel = mapelChoiceBox.getValue();
         String selectedGuru = guruChoiceBox.getValue();
@@ -263,7 +267,6 @@ public class AdminJadwalController {
         LocalTime jamMulai = jamMulaiSpinner.getValue();
         LocalTime jamSelesai = jamSelesaiSpinner.getValue();
 
-        // Validasi input
         if (selectedKelas == null || selectedMapel == null || selectedGuru == null || selectedHari == null || jamMulai == null || jamSelesai == null) {
             showAlert(Alert.AlertType.ERROR, "Validasi Input", "Semua bidang harus diisi.");
             return;
@@ -279,7 +282,6 @@ public class AdminJadwalController {
 
         try (Connection c = MainDataSource.getConnection()) {
             if (idJadwalField.getText().isEmpty()) {
-                // Insert new jadwal
                 String insertQuery = "INSERT INTO JADWAL_PELAJARAN (id_kelas, id_pelajaran, id_guru, hari, jam_mulai, jam_selesai) VALUES (?, ?, ?, ?, ?, ?)";
                 PreparedStatement stmt = c.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
                 stmt.setLong(1, idKelas);
@@ -297,7 +299,6 @@ public class AdminJadwalController {
                 showAlert(Alert.AlertType.INFORMATION, "Berhasil", "Jadwal baru berhasil ditambahkan.");
 
             } else {
-                // Update existing jadwal
                 long jadwalId = Long.parseLong(idJadwalField.getText());
                 String updateQuery = "UPDATE JADWAL_PELAJARAN SET id_kelas = ?, id_pelajaran = ?, id_guru = ?, hari = ?, jam_mulai = ?, jam_selesai = ? WHERE id_jadwal = ?";
                 PreparedStatement stmt = c.prepareStatement(updateQuery);
@@ -312,7 +313,6 @@ public class AdminJadwalController {
                 showAlert(Alert.AlertType.INFORMATION, "Berhasil", "Jadwal berhasil diperbarui.");
             }
         } catch (SQLIntegrityConstraintViolationException e) {
-            // Tangani kasus unik constraint (misal: jadwal yang sama persis sudah ada)
             showAlert(Alert.AlertType.ERROR, "Database Error", "Jadwal yang sama (Kelas, Mapel, Guru, Hari, Jam) sudah ada atau terjadi konflik: " + e.getMessage());
             e.printStackTrace();
         } catch (SQLException e) {
@@ -328,7 +328,12 @@ public class AdminJadwalController {
         HelloApplication app = HelloApplication.getApplicationInstance();
         app.getPrimaryStage().setTitle("Admin View");
         FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("admin-view.fxml"));
-        Scene scene = new Scene(loader.load());
+        Parent root = loader.load();
+        AdminController adminController = loader.getController();
+        if (currentUser != null) { // Pastikan currentUser tidak null sebelum diteruskan
+            adminController.setUser(currentUser); // Meneruskan objek user kembali
+        }
+        Scene scene = new Scene(root);
         app.getPrimaryStage().setScene(scene);
     }
 
