@@ -77,20 +77,18 @@ public class AdminController {
         }
     }
 
-    // Metode baru untuk tombol "Kelola Data Guru"
     @FXML
     void onKelolaGuruClick(ActionEvent event) {
-        showAlert(Alert.AlertType.INFORMATION, "Fitur Belum Tersedia", "Fitur pengelolaan data guru akan segera hadir!");
-        // try {
-        //     HelloApplication app = HelloApplication.getApplicationInstance();
-        //     app.getPrimaryStage().setTitle("Admin - Kelola Data Guru");
-        //     FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("admin-guru-view.fxml"));
-        //     Scene scene = new Scene(loader.load());
-        //     app.getPrimaryStage().setScene(scene);
-        // } catch (IOException e) {
-        //     e.printStackTrace();
-        //     showAlert(Alert.AlertType.ERROR, "Error", "Tidak dapat memuat halaman kelola guru.");
-        // }
+        try {
+            HelloApplication app = HelloApplication.getApplicationInstance();
+            app.getPrimaryStage().setTitle("Admin - Kelola Data Guru");
+            FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("adminAddGuru-view.fxml"));
+            Scene scene = new Scene(loader.load());
+            app.getPrimaryStage().setScene(scene);
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Error", "Tidak dapat memuat halaman kelola guru.");
+        }
     }
 
     // Metode baru untuk tombol "Kelola Mata Pelajaran"
