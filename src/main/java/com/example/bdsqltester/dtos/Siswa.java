@@ -10,10 +10,9 @@ public class Siswa {
     public String nama_siswa;
     public LocalDate tanggal_lahir;
     public String alamat_rumah;
-    public long id_kelas; // Ini id kelas di database
-    // Tambahan untuk menampilkan nama kelas siswa di TableView
-    public String nama_kelas_terkini;
-    public String tahun_ajaran_kelas_terkini;
+    public long id_kelas;
+    public String nama_kelas_terkini; // Dari JOIN dengan tabel KELAS
+    public String tahun_ajaran_kelas_terkini; // Dari JOIN dengan tabel KELAS
 
     public Siswa(long id_siswa, String nomor_induk, String nama_siswa, LocalDate tanggal_lahir, String alamat_rumah, long id_kelas) {
         this.id_siswa = id_siswa;
@@ -22,9 +21,8 @@ public class Siswa {
         this.tanggal_lahir = tanggal_lahir;
         this.alamat_rumah = alamat_rumah;
         this.id_kelas = id_kelas;
-        // Default
-        this.nama_kelas_terkini = "Belum Ada Kelas";
-        this.tahun_ajaran_kelas_terkini = "-";
+        this.nama_kelas_terkini = "Belum Ada Kelas"; // Default
+        this.tahun_ajaran_kelas_terkini = "-"; // Default
     }
     // Konstruktor dengan semua field, termasuk nama_kelas_terkini (jika diperlukan untuk manual construction)
     public Siswa(long id_siswa, String nomor_induk, String nama_siswa, LocalDate tanggal_lahir, String alamat_rumah, long id_kelas, String nama_kelas_terkini, String tahun_ajaran_kelas_terkini) {
@@ -37,6 +35,7 @@ public class Siswa {
         this.nama_kelas_terkini = nama_kelas_terkini;
         this.tahun_ajaran_kelas_terkini = tahun_ajaran_kelas_terkini;
     }
+
 
     public Siswa(ResultSet rs) throws SQLException {
         this.id_siswa = rs.getLong("id_siswa");
@@ -74,6 +73,6 @@ public class Siswa {
 
     @Override
     public String toString() {
-        return nama_siswa + " (" + nomor_induk + ")";
+        return nama_siswa + " (" + nomor_induk + ")"; // Ini akan ditampilkan di ChoiceBox siswa
     }
 }

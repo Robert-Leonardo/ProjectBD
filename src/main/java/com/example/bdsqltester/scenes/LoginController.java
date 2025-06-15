@@ -5,8 +5,9 @@ import com.example.bdsqltester.datasources.MainDataSource;
 import com.example.bdsqltester.scenes.admin.AdminController;
 import com.example.bdsqltester.scenes.guru.GuruController;
 import com.example.bdsqltester.scenes.siswa.SiswaController;
-import com.example.bdsqltester.dtos.User; // Pastikan kelas User ini ada dan sesuai
+import com.example.bdsqltester.dtos.User;
 
+import com.example.bdsqltester.scenes.waliKelas.WaliKelasController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -17,8 +18,9 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 
 import java.io.IOException;
-import java.security.MessageDigest; // Diperlukan untuk MD5
-import java.security.NoSuchAlgorithmException; // Diperlukan untuk MD5
+// Hapus semua import yang terkait dengan hashing
+// import java.security.MessageDigest;
+// import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 
 public class LoginController {
@@ -33,10 +35,8 @@ public class LoginController {
     private TextField usernameField;
 
     // Fungsi untuk memverifikasi kredensial berdasarkan peran yang dipilih
-    boolean verifyCredentials(String username, String password, String role) throws SQLException {
-        // Hashing password input dari user
-        String hashedPassword = password; // Menggunakan fungsi MD5 yang akan kita buat
-
+    // TIDAK MENGGUNAKAN HASHING SAMA SEKALI, LANGSUNG MEMBANDINGKAN PLAIN TEXT
+    boolean verifyCredentials(String username, String plainTextPasswordDariInput, String role) throws SQLException {
         try (Connection c = MainDataSource.getConnection()) {
             PreparedStatement stmt = null;
             ResultSet rs = null;
@@ -55,13 +55,13 @@ public class LoginController {
                 case "Siswa" -> {
                     tableName = "SISWA";
                     usernameColumn = "nomor_induk";
-                    passwordColumn = "password"; // Kolom password di tabel SISWA
+                    passwordColumn = "password";
                     idColumn = "id_siswa";
                 }
-                case "Guru", "Wali kelas" -> { // "Wali kelas" akan login melalui tabel GURU
+                case "Guru", "Wali kelas" -> { // Keduanya login melalui tabel GURU
                     tableName = "GURU";
                     usernameColumn = "username_guru";
-                    passwordColumn = "password_guru"; // Kolom password di tabel GURU
+                    passwordColumn = "password_guru";
                     idColumn = "id_guru";
                 }
                 default -> {
@@ -75,25 +75,14 @@ public class LoginController {
             rs = stmt.executeQuery();
 
             if (rs.next()) {
-                String dbPasswordHash = rs.getString(passwordColumn);
-                // Bandingkan password yang di-hash dari input dengan yang di-hash di DB
-                if (dbPasswordHash != null && dbPasswordHash.equals(hashedPassword)) {
+                String dbPlainTextPassword = rs.getString(passwordColumn);
+                // Bandingkan password dari input langsung dengan yang ada di DB
+                if (dbPlainTextPassword != null && dbPlainTextPassword.equals(plainTextPasswordDariInput)) {
                     return true; // Kredensial valid
                 }
             }
         }
         return false; // Kredensial tidak valid
-    }
-
-    // Fungsi MD5 sederhana (untuk tujuan proyek ini saja)
-    private String MD5(String input) throws NoSuchAlgorithmException {
-        MessageDigest md = MessageDigest.getInstance("MD5");
-        byte[] array = md.digest(input.getBytes());
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < array.length; ++i) {
-            sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1, 3));
-        }
-        return sb.toString();
     }
 
     @FXML
@@ -105,19 +94,19 @@ public class LoginController {
     @FXML
     void onLoginClick(ActionEvent event) {
         String username = usernameField.getText();
-        String password = passwordField.getText();
-        String role = selectRole.getValue();
+        String password = passwordField.getText(); // Password dalam bentuk plain text
+        String role = selectRole.getValue(); // Role yang dipilih dari ChoiceBox
 
         try {
-            if (verifyCredentials(username, password, role)) {
+            if (verifyCredentials(username, password, role)) { // Menggunakan plain text password
                 HelloApplication app = HelloApplication.getApplicationInstance();
-                long userId = -1; // Akan menyimpan id_admin, id_siswa, atau id_guru
-                String actualUsername = ""; // Akan menyimpan username_admin, nomor_induk, atau username_guru
+                long userId = -1;
+                String actualUsername = "";
 
                 // Dapatkan ID pengguna dari tabel yang sesuai setelah verifikasi berhasil
                 try (Connection c = MainDataSource.getConnection()) {
                     String idColumn = "";
-                    String usernameDbColumn = ""; // Kolom username di database untuk role tersebut
+                    String usernameDbColumn = "";
                     String tableName = "";
 
                     switch (role) {
@@ -131,7 +120,7 @@ public class LoginController {
                             idColumn = "id_siswa";
                             usernameDbColumn = "nomor_induk";
                         }
-                        case "Guru", "Wali kelas" -> {
+                        case "Guru", "Wali kelas" -> { // Keduanya dari tabel GURU
                             tableName = "GURU";
                             idColumn = "id_guru";
                             usernameDbColumn = "username_guru";
@@ -150,8 +139,7 @@ public class LoginController {
 
                 // Jika ID pengguna berhasil ditemukan
                 if (userId != -1) {
-                    // Membuat objek User. Password tidak perlu diteruskan, cukup role dan ID/username.
-                    User loggedInUser = new User(userId, actualUsername, "", role);
+                    User loggedInUser = new User(userId, actualUsername, "", role); // Objek User dengan role yang dipilih
 
                     switch (role) {
                         case "Admin" -> {
@@ -159,7 +147,7 @@ public class LoginController {
                             FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("admin-view.fxml"));
                             Parent root = loader.load();
                             AdminController controller = loader.getController();
-                            controller.setUser(loggedInUser); // Set user object to controller
+                            controller.setUser(loggedInUser);
                             app.getPrimaryStage().setScene(new Scene(root));
                         }
                         case "Siswa" -> {
@@ -167,15 +155,23 @@ public class LoginController {
                             FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("siswa-view.fxml"));
                             Parent root = loader.load();
                             SiswaController controller = loader.getController();
-                            controller.setUser(loggedInUser); // Set user object to controller
+                            controller.setUser(loggedInUser);
                             app.getPrimaryStage().setScene(new Scene(root));
                         }
-                        case "Guru", "Wali kelas" -> { // Keduanya menggunakan GuruController
+                        case "Guru" -> {
                             app.getPrimaryStage().setTitle("Guru View");
                             FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("guru-view.fxml"));
                             Parent root = loader.load();
                             GuruController controller = loader.getController();
-                            controller.setUser(loggedInUser); // Set user object to controller
+                            controller.setUser(loggedInUser);
+                            app.getPrimaryStage().setScene(new Scene(root));
+                        }
+                        case "Wali kelas" -> {
+                            app.getPrimaryStage().setTitle("Wali Kelas View");
+                            FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("waliKelas-view.fxml"));
+                            Parent root = loader.load();
+                            WaliKelasController controller = loader.getController();
+                            controller.setUser(loggedInUser);
                             app.getPrimaryStage().setScene(new Scene(root));
                         }
                     }

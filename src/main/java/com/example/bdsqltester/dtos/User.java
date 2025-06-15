@@ -1,10 +1,10 @@
 package com.example.bdsqltester.dtos;
 
 public class User {
-    private long id; // Pastikan ini long
+    private long id;
     private String username;
     private String password;
-    private String role; // Pastikan ini String
+    private String role;
 
     public User(long id, String username, String password, String role) {
         this.id = id;
@@ -13,20 +13,9 @@ public class User {
         this.role = role;
     }
 
-    public long getId() { // Ini yang diperlukan
-        return id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public String getRole() { // Ini yang diperlukan
-        return role;
-    }
-    // ... (setter jika ada)
+    public long getId() { return id; }
+    public String getUsername() { return username; }
+    public String getPassword() { return password; }
+    public String getRole() { return role; }
+    public void setId(long id) { this.id = id; }
 }

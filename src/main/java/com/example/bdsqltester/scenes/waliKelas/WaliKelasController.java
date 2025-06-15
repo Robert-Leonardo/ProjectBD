@@ -1,12 +1,12 @@
-package com.example.bdsqltester.scenes.waliKelas; // Buat package walikelas
+package com.example.bdsqltester.scenes.waliKelas;
 
 import com.example.bdsqltester.HelloApplication;
 import com.example.bdsqltester.datasources.MainDataSource;
 import com.example.bdsqltester.dtos.Guru;
 import com.example.bdsqltester.dtos.Kelas;
-import com.example.bdsqltester.dtos.Siswa;
-import com.example.bdsqltester.dtos.RaporEntry; // DTO RaporEntry
-import com.example.bdsqltester.dtos.User; // DTO User
+import com.example.bdsqltester.dtos.Siswa; // Menggunakan DTO Siswa
+import com.example.bdsqltester.dtos.RaporEntry;
+import com.example.bdsqltester.dtos.User;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -16,29 +16,29 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.util.StringConverter;
+import javafx.beans.property.SimpleStringProperty; // Untuk TableView CellValueFactory
 
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Optional;
 
 public class WaliKelasController {
 
-    @FXML private Label welcomeLabel; // Label selamat datang wali kelas
-    @FXML private Label kelasDiampuLabel; // Menampilkan kelas yang diampu
-    @FXML private ChoiceBox<Siswa> siswaChoiceBox; // Pilih siswa di kelas yang diampu
+    @FXML private Label welcomeLabel;
+    @FXML private Label kelasDiampuLabel;
 
-    @FXML private Label namaSiswaRaporLabel; // Nama siswa di bagian rapor
-    @FXML private Label nomorIndukRaporLabel; // Nomor induk siswa di bagian rapor
-    @FXML private Label kelasRaporLabel; // Kelas siswa di bagian rapor
+    @FXML private TableView<Siswa> siswaTableView; // Mengubah dari ChoiceBox ke TableView
+    @FXML private TableColumn<Siswa, String> siswaIdColumn;
+    @FXML private TableColumn<Siswa, String> siswaNomorIndukColumn;
+    @FXML private TableColumn<Siswa, String> siswaNamaColumn;
 
-    @FXML private TableView<RaporEntry> raporTableView; // Tabel untuk menampilkan nilai rapor
+    @FXML private Label namaSiswaRaporLabel;
+    @FXML private Label nomorIndukRaporLabel;
+    @FXML private Label kelasRaporLabel;
+
+    @FXML private TableView<RaporEntry> raporTableView;
     @FXML private TableColumn<RaporEntry, String> mapelColumn;
     @FXML private TableColumn<RaporEntry, String> jenisUjianColumn;
     @FXML private TableColumn<RaporEntry, String> nilaiColumn;
@@ -46,34 +46,28 @@ public class WaliKelasController {
     @FXML private TableColumn<RaporEntry, String> tahunAjaranColumn;
 
     private User currentUser;
-    private Guru waliKelasInfo; // Menyimpan informasi guru wali kelas
-    private Kelas kelasDiampu; // Menyimpan informasi kelas yang diampu
-    private Siswa selectedSiswaForRapor; // Siswa yang dipilih untuk rapor
+    private Guru waliKelasInfo;
+    private Kelas kelasDiampu;
+    private Siswa selectedSiswaForRapor;
 
     private final ObservableList<Siswa> siswaListDiKelas = FXCollections.observableArrayList();
     private final ObservableList<RaporEntry> raporEntries = FXCollections.observableArrayList();
 
     public void setUser(User user) {
         this.currentUser = user;
-        loadWaliKelasData(); // Memuat data wali kelas dan kelasnya
+        loadWaliKelasData();
     }
 
     @FXML
     void initialize() {
-        // Inisialisasi ChoiceBox siswa
-        siswaChoiceBox.setConverter(new StringConverter<Siswa>() {
-            @Override
-            public String toString(Siswa siswa) {
-                return siswa != null ? siswa.getNama_siswa() + " (" + siswa.getNomor_induk() + ")" : "";
-            }
-            @Override
-            public Siswa fromString(String s) {
-                return null;
-            }
-        });
+        // Inisialisasi kolom TableView Siswa
+        siswaIdColumn.setCellValueFactory(cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue().getId_siswa())));
+        siswaNomorIndukColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getNomor_induk()));
+        siswaNamaColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getNama_siswa()));
+        siswaTableView.setItems(siswaListDiKelas);
 
-        // Listener untuk pemilihan siswa
-        siswaChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+        // Listener untuk pemilihan siswa di TableView
+        siswaTableView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             selectedSiswaForRapor = newVal;
             if (newVal != null) {
                 loadRaporSiswa(newVal.getId_siswa());
@@ -89,21 +83,20 @@ public class WaliKelasController {
         nilaiColumn.setCellValueFactory(cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue().getNilai())));
         semesterColumn.setCellValueFactory(cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue().getSemester())));
         tahunAjaranColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getTahunAjaran()));
-
         raporTableView.setItems(raporEntries);
     }
 
     private void loadWaliKelasData() {
-        if (currentUser == null || (!currentUser.getRole().equals("Wali kelas") && !currentUser.getRole().equals("Guru"))) {
+        if (currentUser == null || !currentUser.getRole().equals("Wali kelas")) {
             welcomeLabel.setText("Selamat datang!");
-            kelasDiampuLabel.setText("Peran tidak valid.");
+            kelasDiampuLabel.setText("Akses tidak diizinkan untuk peran ini.");
+            siswaTableView.setDisable(true); // Disable table jika bukan wali kelas
             return;
         }
 
         long guruId = currentUser.getId();
 
         try (Connection c = MainDataSource.getConnection()) {
-            // Ambil info guru
             String guruQuery = "SELECT id_guru, nama_guru FROM GURU WHERE id_guru = ?";
             PreparedStatement stmtGuru = c.prepareStatement(guruQuery);
             stmtGuru.setLong(1, guruId);
@@ -113,7 +106,6 @@ public class WaliKelasController {
                 waliKelasInfo = new Guru(rsGuru.getLong("id_guru"), rsGuru.getString("nama_guru"), null, null);
                 welcomeLabel.setText("Selamat Datang, Wali Kelas " + waliKelasInfo.getNama_guru() + "!");
 
-                // Ambil info kelas yang diampu guru ini sebagai wali kelas
                 String kelasQuery = "SELECT id_kelas, nama_kelas, tahun_ajaran FROM KELAS WHERE id_wali_kelas = ?";
                 PreparedStatement stmtKelas = c.prepareStatement(kelasQuery);
                 stmtKelas.setLong(1, guruId);
@@ -122,15 +114,16 @@ public class WaliKelasController {
                 if (rsKelas.next()) {
                     kelasDiampu = new Kelas(rsKelas.getLong("id_kelas"), rsKelas.getString("nama_kelas"), rsKelas.getString("tahun_ajaran"), guruId);
                     kelasDiampuLabel.setText("Mengampu Kelas: " + kelasDiampu.getNama_kelas() + " (" + kelasDiampu.getTahun_ajaran() + ")");
-                    loadSiswaDiKelas(kelasDiampu.getId_kelas()); // Muat siswa di kelas ini
+                    loadSiswaDiKelas(kelasDiampu.getId_kelas());
+                    siswaTableView.setDisable(false); // Enable table jika ada kelas
                 } else {
                     kelasDiampuLabel.setText("Anda belum mengampu kelas apapun sebagai Wali Kelas.");
-                    siswaChoiceBox.setDisable(true);
+                    siswaTableView.setDisable(true);
                 }
             } else {
                 welcomeLabel.setText("Data Guru Tidak Ditemukan.");
                 kelasDiampuLabel.setText("");
-                siswaChoiceBox.setDisable(true);
+                siswaTableView.setDisable(true);
             }
         } catch (SQLException e) {
             showAlert(Alert.AlertType.ERROR, "Database Error", "Gagal memuat data wali kelas atau kelas diampu: " + e.getMessage());
@@ -141,7 +134,7 @@ public class WaliKelasController {
     private void loadSiswaDiKelas(long idKelas) {
         siswaListDiKelas.clear();
         try (Connection c = MainDataSource.getConnection()) {
-            String query = "SELECT id_siswa, nomor_induk, nama_siswa, tanggal_lahir, alamat_rumah, id_kelas, " +
+            String query = "SELECT s.id_siswa, s.nomor_induk, s.nama_siswa, s.tanggal_lahir, s.alamat_rumah, s.id_kelas, " +
                     "k.nama_kelas AS nama_kelas_terkini, k.tahun_ajaran AS tahun_ajaran_kelas_terkini " +
                     "FROM SISWA s JOIN KELAS k ON s.id_kelas = k.id_kelas " +
                     "WHERE s.id_kelas = ? ORDER BY nama_siswa";
@@ -151,7 +144,6 @@ public class WaliKelasController {
             while (rs.next()) {
                 siswaListDiKelas.add(new Siswa(rs));
             }
-            siswaChoiceBox.setItems(siswaListDiKelas);
         } catch (SQLException e) {
             showAlert(Alert.AlertType.ERROR, "Database Error", "Gagal memuat daftar siswa di kelas: " + e.getMessage());
             e.printStackTrace();
@@ -201,8 +193,21 @@ public class WaliKelasController {
             return;
         }
         showAlert(Alert.AlertType.INFORMATION, "Fitur Cetak Rapor", "Fitur cetak rapor siswa " + selectedSiswaForRapor.getNama_siswa() + " akan segera diimplementasikan!");
-        // TODO: Implementasi logika cetak rapor (misalnya ke PDF)
-        // Ini akan melibatkan library seperti Apache PDFBox atau JasperReports
+    }
+
+    @FXML
+    void onLogoutClick(ActionEvent event) {
+        try {
+            HelloApplication app = HelloApplication.getApplicationInstance();
+            app.getPrimaryStage().setTitle("Login");
+
+            FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("login-view.fxml"));
+            Parent root = loader.load();
+            app.getPrimaryStage().setScene(new Scene(root));
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Error Logout", "Terjadi kesalahan saat mencoba logout.");
+            e.printStackTrace();
+        }
     }
 
     private void showAlert(Alert.AlertType type, String title, String content) {
