@@ -18,22 +18,24 @@ public class AdminController {
     private Label HiLabel;
 
     @FXML
-    private Button InputDataSiswaButton; // FXML ID sudah benar
-
-    @FXML
     private Label NameLabel;
 
     @FXML
-    private Button inputJadwalButton; // FXML ID sudah benar
+    private Button InputDataSiswaButton;
 
-    private User user; // Objek user yang login
+    @FXML
+    private Button inputJadwalButton;
 
-    // Metode ini dipanggil dari LoginController untuk set user yang login
+    // FXML IDs untuk tombol baru tidak diperlukan di sini karena tidak ada fx:id yang langsung dikaitkan
+    // tapi metodenya tetap dibutuhkan
+
+    private User user;
+
     public void setUser(User user) {
         this.user = user;
         if (user != null) {
             NameLabel.setText(user.getUsername());
-            HiLabel.setText("Hello, Admin"); // Pastikan ini juga di-set
+            HiLabel.setText("Hello,");
         } else {
             NameLabel.setText("Admin");
             HiLabel.setText("Hello, Guest");
@@ -42,11 +44,11 @@ public class AdminController {
 
     @FXML
     void initialize(){
-        // Tidak perlu inisialisasi di sini jika data user di-set via setUser()
+        // Tidak ada inisialisasi tambahan yang diperlukan di sini untuk FXML ini
     }
 
     @FXML
-    void InputDataSiswaButton(ActionEvent event) { // Nama metode sesuai FXML
+    void InputDataSiswaButton(ActionEvent event) {
         try {
             HelloApplication app = HelloApplication.getApplicationInstance();
             app.getPrimaryStage().setTitle("Admin - Kelola Data Siswa");
@@ -61,12 +63,12 @@ public class AdminController {
     }
 
     @FXML
-    void inputJadwalButton(ActionEvent event) { // Metode baru untuk mengelola jadwal
+    void inputJadwalButton(ActionEvent event) {
         try {
             HelloApplication app = HelloApplication.getApplicationInstance();
             app.getPrimaryStage().setTitle("Admin - Kelola Jadwal Kelas");
 
-            FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("adminJadwal-view.fxml")); // Mengarah ke FXML jadwal
+            FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("adminJadwal-view.fxml"));
             Scene scene = new Scene(loader.load());
             app.getPrimaryStage().setScene(scene);
         } catch (IOException e) {
@@ -75,11 +77,44 @@ public class AdminController {
         }
     }
 
+    // Metode baru untuk tombol "Kelola Data Guru"
+    @FXML
+    void onKelolaGuruClick(ActionEvent event) {
+        showAlert(Alert.AlertType.INFORMATION, "Fitur Belum Tersedia", "Fitur pengelolaan data guru akan segera hadir!");
+        // try {
+        //     HelloApplication app = HelloApplication.getApplicationInstance();
+        //     app.getPrimaryStage().setTitle("Admin - Kelola Data Guru");
+        //     FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("admin-guru-view.fxml"));
+        //     Scene scene = new Scene(loader.load());
+        //     app.getPrimaryStage().setScene(scene);
+        // } catch (IOException e) {
+        //     e.printStackTrace();
+        //     showAlert(Alert.AlertType.ERROR, "Error", "Tidak dapat memuat halaman kelola guru.");
+        // }
+    }
+
+    // Metode baru untuk tombol "Kelola Mata Pelajaran"
+    @FXML
+    void onKelolaMataPelajaranClick(ActionEvent event) {
+        showAlert(Alert.AlertType.INFORMATION, "Fitur Belum Tersedia", "Fitur pengelolaan mata pelajaran akan segera hadir!");
+        // try {
+        //     HelloApplication app = HelloApplication.getApplicationInstance();
+        //     app.getPrimaryStage().setTitle("Admin - Kelola Mata Pelajaran");
+        //     FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("admin-mapel-view.fxml"));
+        //     Scene scene = new Scene(loader.load());
+        //     app.getPrimaryStage().setScene(scene);
+        // } catch (IOException e) {
+        //     e.printStackTrace();
+        //     showAlert(Alert.AlertType.ERROR, "Error", "Tidak dapat memuat halaman kelola mata pelajaran.");
+        // }
+    }
+
+
     @FXML
     void logOutButton(ActionEvent event) {
         try {
             HelloApplication app = HelloApplication.getApplicationInstance();
-            app.getPrimaryStage().setTitle("Login"); // Kembali ke judul login
+            app.getPrimaryStage().setTitle("Login");
 
             FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("login-view.fxml"));
             Scene scene = new Scene(loader.load());
@@ -90,7 +125,6 @@ public class AdminController {
         }
     }
 
-    // Helper method untuk menampilkan alert
     private void showAlert(Alert.AlertType type, String title, String content) {
         Alert alert = new Alert(type);
         alert.setTitle(title);

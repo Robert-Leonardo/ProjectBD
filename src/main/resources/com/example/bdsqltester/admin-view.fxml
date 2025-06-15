@@ -10,21 +10,26 @@
 
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.bdsqltester.scenes.admin.AdminController">
     <children>
-        <VBox alignment="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="380.0" prefWidth="580.0" spacing="20.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+        <VBox alignment="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="380.0" prefWidth="580.0" spacing="20.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" styleClass="main-container">
             <children>
-                <Label fx:id="HiLabel" text="Hello, Admin" textAlignment="CENTER">
+                <Label fx:id="HiLabel" text="Hello, Admin" textAlignment="CENTER" styleClass="header-label">
                     <font>
                         <Font size="24.0" />
                     </font>
                 </Label>
-                <Label fx:id="NameLabel" text="[Admin Username]" textAlignment="CENTER">
+                <Label fx:id="NameLabel" text="[Admin Username]" textAlignment="CENTER" styleClass="name-label">
                     <font>
                         <Font size="36.0" />
                     </font>
                 </Label>
-                <Button fx:id="InputDataSiswaButton" mnemonicParsing="false" onAction="#InputDataSiswaButton" prefHeight="40.0" prefWidth="200.0" text="Kelola Data Siswa" />
-                <Button fx:id="inputJadwalButton" mnemonicParsing="false" onAction="#inputJadwalButton" prefHeight="40.0" prefWidth="200.0" text="Kelola Jadwal Kelas" />
-                <Button mnemonicParsing="false" onAction="#logOutButton" prefHeight="40.0" prefWidth="200.0" text="Logout" style="-fx-background-color: #f44336;" textFill="white" />
+                <Button fx:id="InputDataSiswaButton" mnemonicParsing="false" onAction="#InputDataSiswaButton" prefHeight="40.0" prefWidth="200.0" text="Kelola Data Siswa" styleClass="dashboard-button" />
+                <Button fx:id="inputJadwalButton" mnemonicParsing="false" onAction="#inputJadwalButton" prefHeight="40.0" prefWidth="200.0" text="Kelola Jadwal Kelas" styleClass="dashboard-button" />
+
+                <Button mnemonicParsing="false" onAction="#onKelolaGuruClick" prefHeight="40.0" prefWidth="200.0" text="Kelola Data Guru" styleClass="dashboard-button" />
+
+                <Button mnemonicParsing="false" onAction="#onKelolaMataPelajaranClick" prefHeight="40.0" prefWidth="200.0" text="Kelola Mata Pelajaran" styleClass="dashboard-button" />
+
+                <Button mnemonicParsing="false" onAction="#logOutButton" prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: #f44336;" text="Logout"  textFill="White"/>
             </children>
             <padding>
                 <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />

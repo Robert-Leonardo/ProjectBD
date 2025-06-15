@@ -142,7 +142,7 @@ public class SiswaJadwalController {
             FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("siswa-view.fxml"));
             Parent root = loader.load();
             SiswaController controller = loader.getController();
-            controller.setUser(currentUser); // Penting: Teruskan kembali objek user yang sama
+            controller.setUser(currentUser);
             app.getPrimaryStage().setScene(new Scene(root));
         } catch (IOException e) {
             showAlert(Alert.AlertType.ERROR, "Error Navigasi", "Terjadi kesalahan saat kembali ke dashboard siswa.");
