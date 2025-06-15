@@ -75,12 +75,12 @@ public class GuruController {
     void onLihatJadwalMengajarClick(ActionEvent event) {
         try {
             HelloApplication app = HelloApplication.getApplicationInstance();
-            app.getPrimaryStage().setTitle("Jadwal Mengajar Guru"); // Judul baru
+            app.getPrimaryStage().setTitle("Jadwal Mengajar Guru");
 
-            FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("guruJadwal-view.fxml")); // Muat FXML baru
+            FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("guruJadwal-view.fxml"));
             Parent root = loader.load();
             GuruJadwalController controller = loader.getController();
-            controller.setUser(currentUser); // Teruskan objek user ke controller jadwal
+            controller.setUser(currentUser);
             app.getPrimaryStage().setScene(new Scene(root));
         } catch (IOException e) {
             showAlert(Alert.AlertType.ERROR, "Error Loading Jadwal", "Tidak dapat memuat tampilan jadwal: " + e.getMessage());
@@ -90,12 +90,25 @@ public class GuruController {
 
     @FXML
     void onInputNilaiClick(ActionEvent event) {
-        showAlert(Alert.AlertType.INFORMATION, "Fitur Belum Tersedia", "Fitur input nilai siswa akan segera hadir!");
+        try {
+            HelloApplication app = HelloApplication.getApplicationInstance();
+            app.getPrimaryStage().setTitle("Input Nilai Siswa"); // Judul baru
+
+            FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("guruInputNilai-view.fxml")); // Muat FXML baru
+            Parent root = loader.load();
+            GuruInputNilaiController controller = loader.getController();
+            controller.setUser(currentUser); // Teruskan objek user ke controller input nilai
+            app.getPrimaryStage().setScene(new Scene(root));
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Error Loading Input Nilai", "Tidak dapat memuat tampilan input nilai: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     @FXML
     void onLihatAbsensiClick(ActionEvent event) {
         showAlert(Alert.AlertType.INFORMATION, "Fitur Belum Tersedia", "Fitur melihat absensi siswa akan segera hadir!");
+        // TODO: Implementasi navigasi ke halaman absensi guru
     }
 
     @FXML

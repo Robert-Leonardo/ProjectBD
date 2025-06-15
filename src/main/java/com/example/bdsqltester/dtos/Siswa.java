@@ -33,6 +33,22 @@ public class Siswa {
         this.id_kelas = id_kelas;
     }
 
+    public long getId_siswa() {
+        return id_siswa;
+    }
+
+    public String getNomor_induk() {
+        return nomor_induk;
+    }
+
+    public String getNama_siswa() {
+        return nama_siswa;
+    }
+
+    public long getId_kelas() {
+        return id_kelas;
+    }
+
     @Override
     public String toString() {
         return nama_siswa + " (" + nomor_induk + ")";
