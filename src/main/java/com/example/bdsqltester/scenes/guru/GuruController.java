@@ -27,12 +27,11 @@ public class GuruController {
     @FXML
     private Label roleLabel;
 
-    private User currentUser; // Untuk menyimpan data user yang login
+    private User currentUser;
 
-    // Metode ini akan dipanggil dari LoginController
     public void setUser(User user) {
         this.currentUser = user;
-        loadGuruData(); // Panggil method untuk memuat data guru
+        loadGuruData();
     }
 
     @FXML
@@ -49,7 +48,7 @@ public class GuruController {
         }
 
         long guruId = currentUser.getId();
-        String roleName = currentUser.getRole(); // Ambil role yang dipilih (Guru atau Wali kelas)
+        String roleName = currentUser.getRole();
 
         try (Connection c = MainDataSource.getConnection()) {
             String query = "SELECT nama_guru, username_guru FROM GURU WHERE id_guru = ?";
@@ -60,7 +59,7 @@ public class GuruController {
             if (rs.next()) {
                 namaGuruLabel.setText(rs.getString("nama_guru"));
                 usernameGuruLabel.setText(rs.getString("username_guru"));
-                roleLabel.setText(roleName); // Tampilkan role yang login
+                roleLabel.setText(roleName);
             } else {
                 namaGuruLabel.setText("Data Guru Tidak Ditemukan.");
                 usernameGuruLabel.setText("-");
@@ -74,28 +73,36 @@ public class GuruController {
 
     @FXML
     void onLihatJadwalMengajarClick(ActionEvent event) {
-        showAlert(Alert.AlertType.INFORMATION, "Fitur Belum Tersedia", "Fitur melihat jadwal mengajar akan segera hadir!");
-        // TODO: Implementasi navigasi ke halaman jadwal mengajar guru
+        try {
+            HelloApplication app = HelloApplication.getApplicationInstance();
+            app.getPrimaryStage().setTitle("Jadwal Mengajar Guru"); // Judul baru
+
+            FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("guruJadwal-view.fxml")); // Muat FXML baru
+            Parent root = loader.load();
+            GuruJadwalController controller = loader.getController();
+            controller.setUser(currentUser); // Teruskan objek user ke controller jadwal
+            app.getPrimaryStage().setScene(new Scene(root));
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Error Loading Jadwal", "Tidak dapat memuat tampilan jadwal: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     @FXML
     void onInputNilaiClick(ActionEvent event) {
         showAlert(Alert.AlertType.INFORMATION, "Fitur Belum Tersedia", "Fitur input nilai siswa akan segera hadir!");
-        // TODO: Implementasi navigasi ke halaman input nilai guru
     }
 
     @FXML
     void onLihatAbsensiClick(ActionEvent event) {
         showAlert(Alert.AlertType.INFORMATION, "Fitur Belum Tersedia", "Fitur melihat absensi siswa akan segera hadir!");
-        // TODO: Implementasi navigasi ke halaman absensi guru
     }
-
 
     @FXML
     void onLogoutClick(ActionEvent event) {
         try {
             HelloApplication app = HelloApplication.getApplicationInstance();
-            app.getPrimaryStage().setTitle("Login"); // Kembali ke judul login
+            app.getPrimaryStage().setTitle("Login");
 
             FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("login-view.fxml"));
             Parent root = loader.load();

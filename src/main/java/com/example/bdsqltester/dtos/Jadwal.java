@@ -60,6 +60,10 @@ public class Jadwal {
         return nama_guru;
     }
 
+    public String getNama_kelas() {
+        return nama_kelas;
+    }
+
     public String getNama_pelajaran() {
         return nama_pelajaran;
     }
