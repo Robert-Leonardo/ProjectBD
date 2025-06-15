@@ -117,9 +117,6 @@
                                 </children>
                             </HBox>
                             <HBox alignment="CENTER_LEFT" spacing="10.0">
-                                <children>
-                                    <Button mnemonicParsing="false" onAction="#onNaikKelas" text="Naikkan Kelas Semua Siswa (Fitur Lanjut)" />
-                                </children>
                                 <VBox.margin>
                                     <Insets top="10.0" />
                                 </VBox.margin>

@@ -2,10 +2,11 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -13,7 +14,8 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.DatePicker?> <?import javafx.scene.control.ChoiceBox?> <SplitPane dividerPositions="0.5" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.bdsqltester.scenes.admin.AdminAccController">
+
+<SplitPane dividerPositions="0.5" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.bdsqltester.scenes.admin.AdminAccController">
    <items>
       <VBox alignment="TOP_RIGHT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
          <children>
@@ -53,7 +55,7 @@
                   <TextField fx:id="namaSiswaField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
                   <Label text="Tanggal Lahir:" GridPane.rowIndex="3" />
-                  <DatePicker fx:id="tanggalLahirPicker" GridPane.columnIndex="1" GridPane.rowIndex="3" prefWidth="Infinity" /> <Label text="Alamat:" GridPane.rowIndex="4" />
+                  <DatePicker fx:id="tanggalLahirPicker" prefWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="3" /> <Label text="Alamat:" GridPane.rowIndex="4" />
                   <TextField fx:id="alamatField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
 
                   <Label text="Kelas:" GridPane.rowIndex="5" />
@@ -63,24 +65,11 @@
                <VBox.margin>
                   <Insets top="15.0" /> </VBox.margin>
                <children>
-                  <Button mnemonicParsing="false" onAction="#onShowGradesClick" text="Lihat Nilai" />
-                  <Button mnemonicParsing="false" onAction="#onTestButtonClick" text="Test Query" />
-                  <Button mnemonicParsing="false" onAction="#onSaveSiswa" text="Simpan Siswa" style="-fx-background-color: #4CAF50;" textFill="white" /> </children>
-            </HBox>
-            <Label text="Catatan Admin (Opsional)">
-               <padding>
-                  <Insets top="8.0" />
-               </padding>
-            </Label>
-            <TextArea fx:id="notesField" prefHeight="77.0" prefWidth="273.0" /> <Label text="Query Pengujian SQL (Opsional)">
-            <padding>
-               <Insets top="8.0" />
-            </padding>
-         </Label>
-            <TextArea fx:id="queryTestField" prefHeight="77.0" prefWidth="273.0" /> <AnchorPane prefHeight="25.0" prefWidth="273.0" />
+                  <Button mnemonicParsing="false" onAction="#onSaveSiswa" style="-fx-background-color: #4CAF50;" text="Simpan Siswa" textFill="white" /> </children>
+            </HBox> <AnchorPane prefHeight="25.0" prefWidth="273.0" />
             <AnchorPane prefHeight="66.0" prefWidth="273.0">
                <children>
-                  <Button layoutX="197.0" layoutY="32.0" mnemonicParsing="false" onAction="#BackButton" prefHeight="30.0" prefWidth="62.0" text="Back" />
+                  <Button layoutX="210.0" layoutY="33.0" mnemonicParsing="false" onAction="#BackButton" prefHeight="30.0" prefWidth="62.0" text="Back" />
                </children>
             </AnchorPane>
          </children>

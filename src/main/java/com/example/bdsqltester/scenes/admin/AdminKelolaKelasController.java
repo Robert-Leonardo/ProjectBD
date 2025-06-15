@@ -405,14 +405,6 @@ public class AdminKelolaKelasController { // Nama controller tetap sama
         });
     }
 
-
-    // Fitur Naik Kelas (opsional)
-    @FXML
-    void onNaikKelas(ActionEvent event) {
-        showAlert(Alert.AlertType.INFORMATION, "Fitur Belum Tersedia", "Fitur naik kelas akan segera hadir!");
-    }
-
-
     @FXML
     void BackButton(ActionEvent event) throws IOException {
         HelloApplication app = HelloApplication.getApplicationInstance();

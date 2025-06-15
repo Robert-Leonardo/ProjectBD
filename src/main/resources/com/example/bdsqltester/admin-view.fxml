@@ -7,31 +7,30 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.bdsqltester.scenes.admin.AdminController">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.bdsqltester.scenes.admin.AdminController">
     <children>
-        <VBox alignment="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="380.0" prefWidth="580.0" spacing="20.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" styleClass="main-container">
+        <VBox alignment="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="380.0" prefWidth="580.0" spacing="20.0" styleClass="main-container" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
             <children>
-                <Label fx:id="HiLabel" text="Hello, Admin" textAlignment="CENTER" styleClass="header-label">
+                <Label fx:id="HiLabel" styleClass="header-label" text="Hello, Admin" textAlignment="CENTER">
                     <font>
                         <Font size="24.0" />
                     </font>
                 </Label>
-                <Label fx:id="NameLabel" text="[Admin Username]" textAlignment="CENTER" styleClass="name-label">
+                <Label fx:id="NameLabel" styleClass="name-label" text="[Admin Username]" textAlignment="CENTER">
                     <font>
                         <Font size="36.0" />
                     </font>
                 </Label>
-                <Button fx:id="InputDataSiswaButton" mnemonicParsing="false" onAction="#InputDataSiswaButton" prefHeight="40.0" prefWidth="200.0" text="Kelola Data Siswa" styleClass="dashboard-button" />
-                <Button fx:id="inputJadwalButton" mnemonicParsing="false" onAction="#inputJadwalButton" prefHeight="40.0" prefWidth="200.0" text="Kelola Jadwal Kelas" styleClass="dashboard-button" />
+                <Button fx:id="InputDataSiswaButton" mnemonicParsing="false" onAction="#InputDataSiswaButton" prefHeight="40.0" prefWidth="200.0" styleClass="dashboard-button" text="Kelola Data Siswa" />
+                <Button fx:id="inputJadwalButton" mnemonicParsing="false" onAction="#inputJadwalButton" prefHeight="40.0" prefWidth="200.0" styleClass="dashboard-button" text="Kelola Jadwal Kelas" />
 
-                <Button mnemonicParsing="false" onAction="#onKelolaGuruClick" prefHeight="40.0" prefWidth="200.0" text="Kelola Data Guru" styleClass="dashboard-button" />
+                <Button mnemonicParsing="false" onAction="#onKelolaGuruClick" prefHeight="40.0" prefWidth="200.0" styleClass="dashboard-button" text="Kelola Data Guru" />
 
-                <Button mnemonicParsing="false" onAction="#onKelolaMataPelajaranClick" prefHeight="40.0" prefWidth="200.0" text="Kelola Mata Pelajaran" styleClass="dashboard-button" />
+                <Button mnemonicParsing="false" onAction="#onKelolaMataPelajaranClick" prefHeight="40.0" prefWidth="200.0" styleClass="dashboard-button" text="Kelola Mata Pelajaran" />
 
-                <Button mnemonicParsing="false" onAction="#onKelolaKelasClick" prefHeight="40.0" prefWidth="200.0" text="Kelola Kelas &amp; Siswa" styleClass="dashboard-button" />
+                <Button mnemonicParsing="false" onAction="#onKelolaKelasClick" prefHeight="40.0" prefWidth="200.0" styleClass="dashboard-button" text="Kelola Kelas &amp; Siswa" />
 
-                <Button mnemonicParsing="false" onAction="#logOutButton" prefHeight="40.0" prefWidth="200.0" text="Logout" styleClass="logout-button" />
+                <Button mnemonicParsing="false" onAction="#logOutButton" prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: #f44336;" styleClass="logout-button" text="Logout" textFill="WHITE" />
             </children>
             <padding>
                 <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />

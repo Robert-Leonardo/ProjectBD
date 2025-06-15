@@ -14,14 +14,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.sql.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,8 +30,6 @@ public class AdminAccController {
     @FXML private TextField alamatField;
     @FXML private ChoiceBox<String> kelasChoiceBox;
     @FXML private ListView<Siswa> siswaList;
-    @FXML private TextArea notesField;
-    @FXML private TextArea queryTestField;
 
     private final ObservableList<Siswa> siswas = FXCollections.observableArrayList();
     private Map<String, Long> kelasMap = new HashMap<>();
@@ -284,81 +278,6 @@ public class AdminAccController {
             }
         }
         refreshSiswaList();
-    }
-
-
-    @FXML
-    void onShowGradesClick(ActionEvent event) {
-        showAlert(Alert.AlertType.INFORMATION, "Fitur", "Fitur melihat nilai siswa akan diimplementasikan di kemudian hari.");
-    }
-
-    @FXML
-    void onTestButtonClick(ActionEvent event) {
-        showAlert(Alert.AlertType.INFORMATION, "Fitur", "Fungsi Test Query masih tersedia.");
-
-        Stage stage = new Stage();
-        stage.setTitle("Query Results");
-
-        TableView<ArrayList<String>> tableView = new TableView<>();
-
-        ObservableList<ArrayList<String>> data = FXCollections.observableArrayList();
-        ArrayList<String> headers = new ArrayList<>();
-
-        String query = queryTestField.getText();
-
-        try (Connection conn = MainDataSource.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(query)) {
-
-            ResultSetMetaData metaData = rs.getMetaData();
-            int columnCount = metaData.getColumnCount();
-
-            for (int i = 1; i <= columnCount; i++) {
-                final int columnIndex = i - 1;
-                String headerText = metaData.getColumnLabel(i);
-                headers.add(headerText);
-
-                TableColumn<ArrayList<String>, String> column = new TableColumn<>(headerText);
-                column.setCellValueFactory(cellData -> {
-                    ArrayList<String> rowData = cellData.getValue();
-                    if (rowData != null && columnIndex < rowData.size()) {
-                        return new SimpleStringProperty(rowData.get(columnIndex));
-                    } else {
-                        return new SimpleStringProperty("");
-                    }
-                });
-                column.setPrefWidth(120);
-                tableView.getColumns().add(column);
-            }
-
-            while (rs.next()) {
-                ArrayList<String> row = new ArrayList<>();
-                for (int i = 1; i <= columnCount; i++) {
-                    String value = rs.getString(i);
-                    row.add(value != null ? value : "");
-                }
-                data.add(row);
-            }
-
-            if (headers.isEmpty() && data.isEmpty()) {
-                showAlert(Alert.AlertType.INFORMATION, "Query Results", "The query executed successfully but returned no data.");
-                return;
-            }
-
-            tableView.setItems(data);
-            StackPane root = new StackPane();
-            root.getChildren().add(tableView);
-            Scene scene = new Scene(root, 800, 600);
-            stage.setScene(scene);
-            stage.show();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Database Error", "SQL Error: " + e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred: " + e.getMessage());
-        }
     }
 
     @FXML
