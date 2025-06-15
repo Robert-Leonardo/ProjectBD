@@ -29,7 +29,9 @@
 
                 <Button mnemonicParsing="false" onAction="#onKelolaMataPelajaranClick" prefHeight="40.0" prefWidth="200.0" text="Kelola Mata Pelajaran" styleClass="dashboard-button" />
 
-                <Button mnemonicParsing="false" onAction="#logOutButton" prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: #f44336;" text="Logout"  textFill="White"/>
+                <Button mnemonicParsing="false" onAction="#onKelolaKelasClick" prefHeight="40.0" prefWidth="200.0" text="Kelola Kelas &amp; Siswa" styleClass="dashboard-button" />
+
+                <Button mnemonicParsing="false" onAction="#logOutButton" prefHeight="40.0" prefWidth="200.0" text="Logout" styleClass="logout-button" />
             </children>
             <padding>
                 <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
