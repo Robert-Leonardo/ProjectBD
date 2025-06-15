@@ -83,12 +83,12 @@ public class SiswaController {
     void onLihatJadwalClick(ActionEvent event) {
         try {
             HelloApplication app = HelloApplication.getApplicationInstance();
-            app.getPrimaryStage().setTitle("Jadwal Kelas Siswa"); // Judul baru
+            app.getPrimaryStage().setTitle("Jadwal Kelas Siswa");
 
-            FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("siswaJadwal-view.fxml")); // Muat FXML baru
+            FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("siswaJadwal-view.fxml"));
             Parent root = loader.load();
             SiswaJadwalController controller = loader.getController();
-            controller.setUser(currentUser); // Teruskan objek user ke controller jadwal
+            controller.setUser(currentUser);
             app.getPrimaryStage().setScene(new Scene(root));
         } catch (IOException e) {
             showAlert(Alert.AlertType.ERROR, "Error Loading Jadwal", "Tidak dapat memuat tampilan jadwal: " + e.getMessage());
@@ -98,14 +98,24 @@ public class SiswaController {
 
     @FXML
     void onLihatNilaiClick(ActionEvent event) {
-        showAlert(Alert.AlertType.INFORMATION, "Fitur Belum Tersedia", "Fitur melihat nilai ujian akan segera hadir!");
-        // TODO: Implementasi navigasi ke halaman nilai siswa
+        try {
+            HelloApplication app = HelloApplication.getApplicationInstance();
+            app.getPrimaryStage().setTitle("Riwayat Nilai Siswa"); // Judul baru
+
+            FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("siswaLihatNilai-view.fxml")); // Muat FXML baru
+            Parent root = loader.load();
+            SiswaLihatNilaiController controller = loader.getController();
+            controller.setUser(currentUser); // Teruskan objek user ke controller lihat nilai
+            app.getPrimaryStage().setScene(new Scene(root));
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Error Loading Nilai", "Tidak dapat memuat tampilan nilai: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     @FXML
     void onLihatPrestasiClick(ActionEvent event) {
         showAlert(Alert.AlertType.INFORMATION, "Fitur Belum Tersedia", "Fitur melihat prestasi siswa akan segera hadir!");
-        // TODO: Implementasi navigasi ke halaman prestasi siswa
     }
 
     @FXML
