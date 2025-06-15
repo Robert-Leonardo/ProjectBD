@@ -2,8 +2,8 @@ package com.example.bdsqltester.scenes.siswa;
 
 import com.example.bdsqltester.HelloApplication;
 import com.example.bdsqltester.datasources.MainDataSource;
-import com.example.bdsqltester.dtos.User; // Import DTO User
-import com.example.bdsqltester.dtos.Kelas; // Import DTO Kelas
+import com.example.bdsqltester.dtos.User;
+import com.example.bdsqltester.dtos.Kelas;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -18,7 +18,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.format.DateTimeFormatter; // Untuk memformat tanggal
+import java.time.format.DateTimeFormatter;
 
 public class SiswaController {
 
@@ -31,12 +31,11 @@ public class SiswaController {
     @FXML
     private Label kelasLabel;
 
-    private User currentUser; // Untuk menyimpan data user yang login
+    private User currentUser;
 
-    // Metode ini akan dipanggil dari LoginController
     public void setUser(User user) {
         this.currentUser = user;
-        loadSiswaData(); // Panggil method untuk memuat data siswa
+        loadSiswaData();
     }
 
     @FXML
@@ -56,7 +55,6 @@ public class SiswaController {
         long siswaId = currentUser.getId();
 
         try (Connection c = MainDataSource.getConnection()) {
-            // Join dengan tabel KELAS untuk mendapatkan nama kelas
             String query = "SELECT s.nama_siswa, s.nomor_induk, s.tanggal_lahir, k.nama_kelas, k.tahun_ajaran " +
                     "FROM SISWA s JOIN KELAS k ON s.id_kelas = k.id_kelas " +
                     "WHERE s.id_siswa = ?";
@@ -67,7 +65,6 @@ public class SiswaController {
             if (rs.next()) {
                 namaSiswaLabel.setText(rs.getString("nama_siswa"));
                 nomorIndukLabel.setText(rs.getString("nomor_induk"));
-                // Format tanggal lahir menjadi string yang lebih mudah dibaca
                 tanggalLahirLabel.setText(rs.getDate("tanggal_lahir").toLocalDate().format(DateTimeFormatter.ofPattern("dd MMMM yyyy")));
                 kelasLabel.setText(rs.getString("nama_kelas") + " (" + rs.getString("tahun_ajaran") + ")");
             } else {
@@ -84,8 +81,19 @@ public class SiswaController {
 
     @FXML
     void onLihatJadwalClick(ActionEvent event) {
-        showAlert(Alert.AlertType.INFORMATION, "Fitur Belum Tersedia", "Fitur melihat jadwal kelas akan segera hadir!");
-        // TODO: Implementasi navigasi ke halaman jadwal siswa
+        try {
+            HelloApplication app = HelloApplication.getApplicationInstance();
+            app.getPrimaryStage().setTitle("Jadwal Kelas Siswa"); // Judul baru
+
+            FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("siswaJadwal-view.fxml")); // Muat FXML baru
+            Parent root = loader.load();
+            SiswaJadwalController controller = loader.getController();
+            controller.setUser(currentUser); // Teruskan objek user ke controller jadwal
+            app.getPrimaryStage().setScene(new Scene(root));
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Error Loading Jadwal", "Tidak dapat memuat tampilan jadwal: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     @FXML
@@ -104,7 +112,7 @@ public class SiswaController {
     void onLogoutClick(ActionEvent event) {
         try {
             HelloApplication app = HelloApplication.getApplicationInstance();
-            app.getPrimaryStage().setTitle("Login"); // Kembali ke judul login
+            app.getPrimaryStage().setTitle("Login");
 
             FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("login-view.fxml"));
             Parent root = loader.load();

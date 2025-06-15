@@ -44,6 +44,26 @@ public class Jadwal {
         this.jam_selesai = jam_selesai;
     }
 
+    public LocalTime getJam_selesai() {
+        return jam_selesai;
+    }
+
+    public LocalTime getJam_mulai() {
+        return jam_mulai;
+    }
+
+    public String getHari() {
+        return hari;
+    }
+
+    public String getNama_guru() {
+        return nama_guru;
+    }
+
+    public String getNama_pelajaran() {
+        return nama_pelajaran;
+    }
+
     @Override
     public String toString() {
         return hari + ", " + nama_kelas + " (" + nama_pelajaran + " oleh " + nama_guru + ") " + jam_mulai + " - " + jam_selesai;
