@@ -115,7 +115,19 @@ public class SiswaController {
 
     @FXML
     void onLihatPrestasiClick(ActionEvent event) {
-        showAlert(Alert.AlertType.INFORMATION, "Fitur Belum Tersedia", "Fitur melihat prestasi siswa akan segera hadir!");
+        try {
+            HelloApplication app = HelloApplication.getApplicationInstance();
+            app.getPrimaryStage().setTitle("Riwayat Prestasi Siswa"); // Judul baru
+
+            FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("siswaPrestasi-view.fxml")); // Muat FXML baru
+            Parent root = loader.load();
+            SiswaPrestasiController controller = loader.getController();
+            controller.setUser(currentUser); // Teruskan objek user ke controller lihat prestasi
+            app.getPrimaryStage().setScene(new Scene(root));
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Error Loading Prestasi", "Tidak dapat memuat tampilan prestasi: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     @FXML
