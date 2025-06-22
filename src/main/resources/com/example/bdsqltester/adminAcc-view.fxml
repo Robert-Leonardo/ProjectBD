@@ -48,27 +48,34 @@
                </rowConstraints>
                <children>
                   <Label maxHeight="1.7976931348623157E308" text="ID Siswa:" />
-                  <TextField fx:id="idField" GridPane.columnIndex="1" /> <Label text="Nomor Induk:" GridPane.rowIndex="1" />
+                  <TextField fx:id="idField" GridPane.columnIndex="1" />
+                  <Label text="Nomor Induk:" GridPane.rowIndex="1" />
                   <TextField fx:id="nomorIndukField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
                   <Label text="Nama Siswa:" GridPane.rowIndex="2" />
                   <TextField fx:id="namaSiswaField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
                   <Label text="Tanggal Lahir:" GridPane.rowIndex="3" />
-                  <DatePicker fx:id="tanggalLahirPicker" prefWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="3" /> <Label text="Alamat:" GridPane.rowIndex="4" />
+                  <DatePicker fx:id="tanggalLahirPicker" prefWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                  <Label text="Alamat:" GridPane.rowIndex="4" />
                   <TextField fx:id="alamatField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
 
                   <Label text="Kelas:" GridPane.rowIndex="5" />
-                  <ChoiceBox fx:id="kelasChoiceBox" prefWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="5" /> </children>
+                  <ChoiceBox fx:id="kelasChoiceBox" prefWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+               </children>
             </GridPane>
             <HBox alignment="CENTER_RIGHT" prefWidth="200.0" spacing="8.0">
                <VBox.margin>
-                  <Insets top="15.0" /> </VBox.margin>
+                  <Insets top="15.0" />
+               </VBox.margin>
                <children>
-                  <Button mnemonicParsing="false" onAction="#onSaveSiswa" style="-fx-background-color: #4CAF50;" text="Simpan Siswa" textFill="white" /> </children>
-            </HBox> <AnchorPane prefHeight="25.0" prefWidth="273.0" />
+                  <Button mnemonicParsing="false" onAction="#onSaveSiswa" style="-fx-background-color: #4CAF50;" text="Simpan Siswa" textFill="white" />
+               </children>
+            </HBox>
+            <AnchorPane prefHeight="25.0" prefWidth="273.0" />
             <AnchorPane prefHeight="66.0" prefWidth="273.0">
                <children>
+                  <Button layoutX="100.0" layoutY="33.0" mnemonicParsing="false" onAction="#onAddPrestasiClick" prefHeight="30.0" prefWidth="100.0" text="Add Prestasi" />
                   <Button layoutX="210.0" layoutY="33.0" mnemonicParsing="false" onAction="#BackButton" prefHeight="30.0" prefWidth="62.0" text="Back" />
                </children>
             </AnchorPane>

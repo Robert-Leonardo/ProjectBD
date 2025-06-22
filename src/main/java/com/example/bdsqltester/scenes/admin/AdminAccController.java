@@ -281,6 +281,34 @@ public class AdminAccController {
     }
 
     @FXML
+    void onAddPrestasiClick(ActionEvent event) {
+        if (idField.getText().isEmpty()) {
+            showAlert(Alert.AlertType.ERROR, "Pilih Siswa", "Pilih siswa terlebih dahulu untuk menambahkan prestasi.");
+            return;
+        }
+
+        long idSiswa = Long.parseLong(idField.getText());
+        String namaSiswa = namaSiswaField.getText(); // Ambil nama siswa
+
+        try {
+            HelloApplication app = HelloApplication.getApplicationInstance();
+            app.getPrimaryStage().setTitle("Admin - Kelola Prestasi Siswa");
+
+            FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("adminKelolaPrestasi-view.fxml")); // FXML untuk kelola prestasi
+            Parent root = loader.load();
+            AdminKelolaPrestasiController controller = loader.getController();
+            // Teruskan id dan nama siswa yang dipilih
+            controller.setSiswaData(idSiswa, namaSiswa, currentUser); // Meneruskan data siswa dan admin
+
+            Scene scene = new Scene(root);
+            app.getPrimaryStage().setScene(scene);
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Error Memuat Tampilan", "Tidak dapat membuka halaman pengelolaan prestasi siswa.");
+        }
+    }
+
+    @FXML
     void BackButton(ActionEvent event) throws Exception {
         HelloApplication app = HelloApplication.getApplicationInstance();
         app.getPrimaryStage().setTitle("Admin View");
