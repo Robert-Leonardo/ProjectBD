@@ -2,8 +2,8 @@ package com.example.bdsqltester.scenes.siswa;
 
 import com.example.bdsqltester.HelloApplication;
 import com.example.bdsqltester.datasources.MainDataSource;
-import com.example.bdsqltester.dtos.PrestasiSiswa; // Import DTO PrestasiSiswa
-import com.example.bdsqltester.dtos.User; // Import DTO User
+import com.example.bdsqltester.dtos.PrestasiSiswa;
+import com.example.bdsqltester.dtos.User;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -16,24 +16,24 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.beans.property.SimpleStringProperty; // Untuk TableView CellValueFactory
+import javafx.beans.property.SimpleStringProperty;
 
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.format.DateTimeFormatter;
+// import java.time.format.DateTimeFormatter; // Hapus ini jika tidak ada pemformatan tanggal
 
 public class SiswaPrestasiController {
 
-    @FXML private Label welcomeLabel; // Label untuk menampilkan nama siswa
+    @FXML private Label welcomeLabel;
     @FXML private TableView<PrestasiSiswa> prestasiTableView;
     @FXML private TableColumn<PrestasiSiswa, String> namaPrestasiColumn;
     @FXML private TableColumn<PrestasiSiswa, String> tingkatColumn;
     @FXML private TableColumn<PrestasiSiswa, String> jenisLombaColumn;
     @FXML private TableColumn<PrestasiSiswa, String> deskripsiColumn;
-    @FXML private TableColumn<PrestasiSiswa, String> tanggalPrestasiColumn;
+
 
     private User currentUser;
     private long idSiswaLoggedIn;
@@ -53,9 +53,6 @@ public class SiswaPrestasiController {
         tingkatColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getTingkat()));
         jenisLombaColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getJenisLomba()));
         deskripsiColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDeskripsi()));
-        tanggalPrestasiColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
-                cellData.getValue().getTanggalPrestasi().format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))
-        ));
 
         prestasiTableView.setItems(prestasiList);
     }
@@ -66,10 +63,9 @@ public class SiswaPrestasiController {
             return;
         }
 
-        idSiswaLoggedIn = currentUser.getId(); // Menggunakan ID dari objek User
+        idSiswaLoggedIn = currentUser.getId();
 
         try (Connection c = MainDataSource.getConnection()) {
-            // Ambil nama siswa dari tabel SISWA
             String siswaQuery = "SELECT nama_siswa FROM SISWA WHERE id_siswa = ?";
             PreparedStatement stmtSiswa = c.prepareStatement(siswaQuery);
             stmtSiswa.setLong(1, idSiswaLoggedIn);
@@ -78,10 +74,7 @@ public class SiswaPrestasiController {
             if (rsSiswa.next()) {
                 namaSiswaLoggedIn = rsSiswa.getString("nama_siswa");
                 welcomeLabel.setText("Prestasi untuk " + namaSiswaLoggedIn + "!");
-
-                // Sekarang muat prestasi berdasarkan id_siswa
                 loadPrestasiBySiswa(c, idSiswaLoggedIn);
-
             } else {
                 welcomeLabel.setText("Data Siswa Tidak Ditemukan.");
             }
@@ -93,8 +86,8 @@ public class SiswaPrestasiController {
 
     private void loadPrestasiBySiswa(Connection c, long idSiswa) throws SQLException {
         prestasiList.clear();
-        String query = "SELECT id_prestasi, id_siswa, nama_prestasi, tingkat, jenis_lomba, deskripsi, tanggal_prestasi " +
-                "FROM PRESTASI_SISWA WHERE id_siswa = ? ORDER BY tanggal_prestasi DESC";
+        String query = "SELECT id_prestasi, id_siswa, nama_prestasi, tingkat, jenis_lomba, deskripsi " +
+                "FROM PRESTASI_SISWA WHERE id_siswa = ? ORDER BY nama_prestasi DESC";
         PreparedStatement stmt = c.prepareStatement(query);
         stmt.setLong(1, idSiswa);
         ResultSet rs = stmt.executeQuery();
@@ -113,7 +106,7 @@ public class SiswaPrestasiController {
             FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("siswa-view.fxml"));
             Parent root = loader.load();
             SiswaController controller = loader.getController();
-            controller.setUser(currentUser); // Penting: Teruskan kembali objek user yang sama
+            controller.setUser(currentUser);
             app.getPrimaryStage().setScene(new Scene(root));
         } catch (IOException e) {
             showAlert(Alert.AlertType.ERROR, "Error Navigasi", "Terjadi kesalahan saat kembali ke dashboard siswa.");

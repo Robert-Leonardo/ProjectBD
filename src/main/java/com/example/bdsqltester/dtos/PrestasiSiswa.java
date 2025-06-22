@@ -2,7 +2,6 @@ package com.example.bdsqltester.dtos;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
 
 public class PrestasiSiswa {
     private long id_prestasi;
@@ -12,19 +11,17 @@ public class PrestasiSiswa {
     private String tingkat;
     private String jenisLomba;
     private String deskripsi;
-    private LocalDate tanggalPrestasi;
 
     public PrestasiSiswa() {
     }
 
-    public PrestasiSiswa(long id_prestasi, long id_siswa, String namaPrestasi, String tingkat, String jenisLomba, String deskripsi, LocalDate tanggalPrestasi) {
+    public PrestasiSiswa(long id_prestasi, long id_siswa, String namaPrestasi, String tingkat, String jenisLomba, String deskripsi) {
         this.id_prestasi = id_prestasi;
         this.id_siswa = id_siswa;
         this.namaPrestasi = namaPrestasi;
         this.tingkat = tingkat;
         this.jenisLomba = jenisLomba;
         this.deskripsi = deskripsi;
-        this.tanggalPrestasi = tanggalPrestasi;
     }
 
     public PrestasiSiswa(ResultSet rs) throws SQLException {
@@ -34,7 +31,6 @@ public class PrestasiSiswa {
         this.tingkat = rs.getString("tingkat");
         this.jenisLomba = rs.getString("jenis_lomba");
         this.deskripsi = rs.getString("deskripsi");
-        this.tanggalPrestasi = rs.getDate("tanggal_prestasi").toLocalDate();
         // Coba ambil nama siswa jika di-join di query
         try {
             this.namaSiswa = rs.getString("nama_siswa");
@@ -51,7 +47,6 @@ public class PrestasiSiswa {
     public String getTingkat() { return tingkat; }
     public String getJenisLomba() { return jenisLomba; }
     public String getDeskripsi() { return deskripsi; }
-    public LocalDate getTanggalPrestasi() { return tanggalPrestasi; }
 
     // Setters (jika diperlukan untuk pengeditan dari UI)
     public void setId_prestasi(long id_prestasi) { this.id_prestasi = id_prestasi; }
@@ -61,7 +56,6 @@ public class PrestasiSiswa {
     public void setTingkat(String tingkat) { this.tingkat = tingkat; }
     public void setJenisLomba(String jenisLomba) { this.jenisLomba = jenisLomba; }
     public void setDeskripsi(String deskripsi) { this.deskripsi = deskripsi; }
-    public void setTanggalPrestasi(LocalDate tanggalPrestasi) { this.tanggalPrestasi = tanggalPrestasi; }
 
     @Override
     public String toString() {
