@@ -33,6 +33,7 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                </rowConstraints>
                <children>
                   <Label text="Nomor Induk:" />
@@ -41,6 +42,8 @@
                   <Label fx:id="tanggalLahirLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                   <Label text="Kelas:" GridPane.rowIndex="2" />
                   <Label fx:id="kelasLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <Label text="Wali Kelas:" GridPane.rowIndex="3" />
+                  <Label fx:id="WaliKelasLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                </children>
             </GridPane>
             <Button mnemonicParsing="false" onAction="#onLihatJadwalClick" prefHeight="30.0" prefWidth="150.0" text="Lihat Jadwal Kelas" />

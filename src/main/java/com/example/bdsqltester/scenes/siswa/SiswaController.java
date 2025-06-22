@@ -30,6 +30,8 @@ public class SiswaController {
     private Label tanggalLahirLabel;
     @FXML
     private Label kelasLabel;
+    @FXML
+    private Label WaliKelasLabel;
 
     private User currentUser;
 
@@ -49,14 +51,18 @@ public class SiswaController {
             nomorIndukLabel.setText("-");
             tanggalLahirLabel.setText("-");
             kelasLabel.setText("-");
+            WaliKelasLabel.setText("-");
             return;
         }
 
         long siswaId = currentUser.getId();
 
         try (Connection c = MainDataSource.getConnection()) {
-            String query = "SELECT s.nama_siswa, s.nomor_induk, s.tanggal_lahir, k.nama_kelas, k.tahun_ajaran " +
-                    "FROM SISWA s JOIN KELAS k ON s.id_kelas = k.id_kelas " +
+            String query = "SELECT s.nama_siswa, s.nomor_induk, s.tanggal_lahir, " +
+                    "k.nama_kelas, k.tahun_ajaran, g.nama_guru AS nama_wali_kelas " +
+                    "FROM SISWA s " +
+                    "JOIN KELAS k ON s.id_kelas = k.id_kelas " +
+                    "LEFT JOIN GURU g ON k.id_wali_kelas = g.id_guru " +
                     "WHERE s.id_siswa = ?";
             PreparedStatement stmt = c.prepareStatement(query);
             stmt.setLong(1, siswaId);
@@ -67,6 +73,8 @@ public class SiswaController {
                 nomorIndukLabel.setText(rs.getString("nomor_induk"));
                 tanggalLahirLabel.setText(rs.getDate("tanggal_lahir").toLocalDate().format(DateTimeFormatter.ofPattern("dd MMMM yyyy")));
                 kelasLabel.setText(rs.getString("nama_kelas") + " (" + rs.getString("tahun_ajaran") + ")");
+                String namaWaliKelas = rs.getString("nama_wali_kelas");
+                WaliKelasLabel.setText(namaWaliKelas != null ? namaWaliKelas : "Belum Ditentukan");
             } else {
                 namaSiswaLabel.setText("Data Siswa Tidak Ditemukan.");
                 nomorIndukLabel.setText("-");
