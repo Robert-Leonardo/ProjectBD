@@ -5,6 +5,7 @@ import com.example.bdsqltester.datasources.MainDataSource;
 import com.example.bdsqltester.dtos.AbsensiSiswa;
 import com.example.bdsqltester.dtos.Kelas;
 import com.example.bdsqltester.dtos.MataPelajaran;
+import com.example.bdsqltester.dtos.Siswa;
 import com.example.bdsqltester.dtos.User;
 
 import javafx.collections.FXCollections;
@@ -50,7 +51,7 @@ public class GuruAbsensiController {
     private final ObservableList<MataPelajaran> mapelDiajarList = FXCollections.observableArrayList();
     private final ObservableList<AbsensiSiswa> absensiList = FXCollections.observableArrayList();
 
-    private Map<Long, List<Long>> jadwalMengajarKelasMapel = new HashMap<>();
+    private Map<Long, List<MataPelajaran>> jadwalMengajarKelasMapel = new HashMap<>();
 
 
     public void setUser(User user) {
@@ -62,54 +63,66 @@ public class GuruAbsensiController {
     void initialize() {
         absensiTableView.setEditable(true);
 
-        kelasChoiceBox.setConverter(new StringConverter<>() {
+        kelasChoiceBox.setConverter(new StringConverter<Kelas>() {
             @Override public String toString(Kelas kelas) { return kelas != null ? kelas.getNama_kelas() + " (" + kelas.getTahun_ajaran() + ")" : ""; }
             @Override public Kelas fromString(String s) { return null; }
         });
         kelasChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
-                loadMataPelajaranByKelas(newVal.getId_kelas()); // Muat mapel saat kelas dipilih
-                loadAbsensiUntukKelasDanTanggal(newVal.getId_kelas(), tanggalAbsensiPicker.getValue());
+                loadMataPelajaranDiajarDiKelas(newVal.getId_kelas());
             } else {
                 mapelChoiceBox.getItems().clear();
                 absensiList.clear();
             }
         });
 
-        mapelChoiceBox.setConverter(new StringConverter<>() {
+        mapelChoiceBox.setConverter(new StringConverter<MataPelajaran>() {
             @Override public String toString(MataPelajaran mapel) { return mapel != null ? mapel.getNama_pelajaran() : ""; }
             @Override public MataPelajaran fromString(String s) { return null; }
         });
-
-        tanggalAbsensiPicker.setValue(LocalDate.now()); // Default tanggal hari ini
-        tanggalAbsensiPicker.valueProperty().addListener((obs, oldVal, newVal) -> {
-            if (kelasChoiceBox.getValue() != null && newVal != null) {
-                loadAbsensiUntukKelasDanTanggal(kelasChoiceBox.getValue().getId_kelas(), newVal);
+        mapelChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (kelasChoiceBox.getValue() != null && newVal != null && tanggalAbsensiPicker.getValue() != null) {
+                loadAbsensiUntukKelasTanggalMapel(
+                        kelasChoiceBox.getValue().getId_kelas(),
+                        tanggalAbsensiPicker.getValue(),
+                        newVal.getId_pelajaran()
+                );
+            } else {
+                absensiList.clear();
             }
         });
 
-        // Inisialisasi kolom TableView Absensi Siswa
+
+        tanggalAbsensiPicker.setValue(LocalDate.now());
+        tanggalAbsensiPicker.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (kelasChoiceBox.getValue() != null && mapelChoiceBox.getValue() != null && newVal != null) {
+                loadAbsensiUntukKelasTanggalMapel(
+                        kelasChoiceBox.getValue().getId_kelas(),
+                        newVal,
+                        mapelChoiceBox.getValue().getId_pelajaran()
+                );
+            } else {
+                absensiList.clear();
+            }
+        });
+
         siswaIdColumn.setCellValueFactory(cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue().getId_siswa())));
         siswaNamaColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getNamaSiswa()));
 
-        // Kolom Status Absensi (menggunakan ComboBoxTableCell untuk pilihan)
         statusAbsensiColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getStatus()));
         statusAbsensiColumn.setCellFactory(ComboBoxTableCell.forTableColumn("Hadir", "Sakit", "Izin", "Alpha"));
         statusAbsensiColumn.setOnEditCommit(event -> {
             AbsensiSiswa absensi = event.getRowValue();
             absensi.setStatus(event.getNewValue());
-            // Simpan perubahan status ke database
-            saveAbsensiStatus(absensi);
+            saveAbsensiStatus(absensi, kelasChoiceBox.getValue().getId_kelas(), mapelChoiceBox.getValue().getId_pelajaran());
         });
 
-        // Kolom Keterangan (menggunakan TextFieldTableCell untuk input bebas)
         keteranganColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getKeterangan()));
         keteranganColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         keteranganColumn.setOnEditCommit(event -> {
             AbsensiSiswa absensi = event.getRowValue();
             absensi.setKeterangan(event.getNewValue());
-            // Simpan perubahan keterangan ke database
-            saveAbsensiStatus(absensi);
+            saveAbsensiStatus(absensi, kelasChoiceBox.getValue().getId_kelas(), mapelChoiceBox.getValue().getId_pelajaran());
         });
 
         absensiTableView.setItems(absensiList);
@@ -138,7 +151,7 @@ public class GuruAbsensiController {
                 namaGuruLoggedIn = rsGuru.getString("nama_guru");
                 welcomeLabel.setText("Absensi untuk " + namaGuruLoggedIn + "!");
 
-                loadKelasDiajarGuru(c);
+                loadJadwalMengajarGuru(c);
             } else {
                 welcomeLabel.setText("Data Guru Tidak Ditemukan.");
                 infoGuruLabel.setText("");
@@ -149,34 +162,38 @@ public class GuruAbsensiController {
         }
     }
 
-    private void loadKelasDiajarGuru(Connection c) throws SQLException {
+    private void loadJadwalMengajarGuru(Connection c) throws SQLException {
         kelasDiampuList.clear();
         jadwalMengajarKelasMapel.clear();
 
-        String query = "SELECT DISTINCT j.id_kelas, k.nama_kelas, k.tahun_ajaran, j.id_pelajaran " +
+        String query = "SELECT DISTINCT j.id_kelas, k.nama_kelas, k.tahun_ajaran, j.id_pelajaran, mp.nama_pelajaran " +
                 "FROM JADWAL_PELAJARAN j " +
                 "JOIN KELAS k ON j.id_kelas = k.id_kelas " +
-                "WHERE j.id_guru = ? ORDER BY k.nama_kelas";
+                "JOIN MATA_PELAJARAN mp ON j.id_pelajaran = mp.id_pelajaran " +
+                "WHERE j.id_guru = ? ORDER BY k.nama_kelas, mp.nama_pelajaran";
         PreparedStatement stmt = c.prepareStatement(query);
         stmt.setLong(1, idGuruLoggedIn);
         ResultSet rs = stmt.executeQuery();
 
-        Map<Long, Kelas> uniqueKelas = new HashMap<>();
+        Map<Long, Kelas> tempUniqueKelas = new HashMap<>();
         while (rs.next()) {
             long idKelas = rs.getLong("id_kelas");
             String namaKelas = rs.getString("nama_kelas");
             String tahunAjaran = rs.getString("tahun_ajaran");
             long idMapel = rs.getLong("id_pelajaran");
+            String namaMapel = rs.getString("nama_pelajaran");
 
-            uniqueKelas.putIfAbsent(idKelas, new Kelas(idKelas, namaKelas, tahunAjaran, null));
-            jadwalMengajarKelasMapel.computeIfAbsent(idKelas, k -> new ArrayList<>()).add(idMapel);
+            tempUniqueKelas.putIfAbsent(idKelas, new Kelas(idKelas, namaKelas, tahunAjaran, null));
+            jadwalMengajarKelasMapel.computeIfAbsent(idKelas, k -> new ArrayList<>()).add(new MataPelajaran(idMapel, namaMapel));
         }
-        kelasDiampuList.addAll(uniqueKelas.values());
+        kelasDiampuList.addAll(tempUniqueKelas.values());
         kelasChoiceBox.setItems(kelasDiampuList);
         kelasChoiceBox.setDisable(false);
 
         if (!kelasDiampuList.isEmpty()) {
             kelasChoiceBox.getSelectionModel().selectFirst();
+            tanggalAbsensiPicker.setDisable(false);
+            // mapelChoiceBox akan diaktifkan di loadMataPelajaranDiajarDiKelas
         } else {
             infoGuruLabel.setText("Anda belum memiliki jadwal mengajar di kelas manapun.");
             kelasChoiceBox.setDisable(true);
@@ -186,53 +203,27 @@ public class GuruAbsensiController {
         }
     }
 
-    private void loadMataPelajaranByKelas(long idKelas) {
+    private void loadMataPelajaranDiajarDiKelas(long idKelas) {
         mapelDiajarList.clear();
         mapelChoiceBox.getItems().clear();
 
-        List<Long> mapelIdsDiajarDiKelasIni = jadwalMengajarKelasMapel.get(idKelas);
-        if (mapelIdsDiajarDiKelasIni == null || mapelIdsDiajarDiKelasIni.isEmpty()) {
-            mapelChoiceBox.setDisable(true);
-            return;
-        }
-
-        try (Connection c = MainDataSource.getConnection()) {
-            StringBuilder queryBuilder = new StringBuilder("SELECT id_pelajaran, nama_pelajaran FROM MATA_PELAJARAN WHERE id_pelajaran IN (");
-            for (int i = 0; i < mapelIdsDiajarDiKelasIni.size(); i++) {
-                queryBuilder.append("?");
-                if (i < mapelIdsDiajarDiKelasIni.size() - 1) {
-                    queryBuilder.append(",");
-                }
-            }
-            queryBuilder.append(") ORDER BY nama_pelajaran");
-            PreparedStatement stmt = c.prepareStatement(queryBuilder.toString());
-
-            for (int i = 0; i < mapelIdsDiajarDiKelasIni.size(); i++) {
-                stmt.setLong(i + 1, mapelIdsDiajarDiKelasIni.get(i));
-            }
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                mapelDiajarList.add(new MataPelajaran(rs.getLong("id_pelajaran"), rs.getString("nama_pelajaran")));
-            }
+        List<MataPelajaran> mapelTaughtInClass = jadwalMengajarKelasMapel.get(idKelas);
+        if (mapelTaughtInClass != null && !mapelTaughtInClass.isEmpty()) {
+            mapelDiajarList.addAll(mapelTaughtInClass);
             mapelChoiceBox.setItems(mapelDiajarList);
-            mapelChoiceBox.setDisable(false);
-
-            if (!mapelDiajarList.isEmpty()) {
-                mapelChoiceBox.getSelectionModel().selectFirst();
-            }
-        } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Database Error", "Gagal memuat mata pelajaran yang diajar di kelas ini: " + e.getMessage());
-            e.printStackTrace();
+            mapelChoiceBox.setDisable(false); // Aktifkan mapelChoiceBox
+            mapelChoiceBox.getSelectionModel().selectFirst();
+        } else {
+            mapelChoiceBox.setDisable(true);
         }
     }
 
 
-    private void loadAbsensiUntukKelasDanTanggal(long idKelas, LocalDate tanggal) {
+    private void loadAbsensiUntukKelasTanggalMapel(long idKelas, LocalDate tanggal, long idMapel) {
         absensiList.clear();
-        if (tanggal == null) return;
+        if (tanggal == null || idMapel <= 0) return;
 
         try (Connection c = MainDataSource.getConnection()) {
-            // Ambil semua siswa di kelas tersebut
             String siswaQuery = "SELECT id_siswa, nama_siswa FROM SISWA WHERE id_kelas = ? ORDER BY nama_siswa";
             PreparedStatement stmtSiswa = c.prepareStatement(siswaQuery);
             stmtSiswa.setLong(1, idKelas);
@@ -242,71 +233,77 @@ public class GuruAbsensiController {
             while (rsSiswa.next()) {
                 long idSiswa = rsSiswa.getLong("id_siswa");
                 String namaSiswa = rsSiswa.getString("nama_siswa");
+                MataPelajaran selectedMapel = mapelChoiceBox.getValue();
+                String namaMapel = (selectedMapel != null) ? selectedMapel.getNama_pelajaran() : "";
 
-                // Cek status absensi siswa ini untuk tanggal yang dipilih
-                String absensiQuery = "SELECT id_absensi, status, keterangan FROM ABSENSI_SISWA WHERE id_siswa = ? AND tanggal = ?";
+
+                String absensiQuery = "SELECT id_absensi, status, keterangan, id_pelajaran FROM ABSENSI_SISWA WHERE id_siswa = ? AND tanggal = ? AND id_pelajaran = ?";
                 PreparedStatement stmtAbsensi = c.prepareStatement(absensiQuery);
                 stmtAbsensi.setLong(1, idSiswa);
                 stmtAbsensi.setDate(2, java.sql.Date.valueOf(tanggal));
+                stmtAbsensi.setLong(3, idMapel);
                 ResultSet rsAbsensi = stmtAbsensi.executeQuery();
 
                 if (rsAbsensi.next()) {
-                    // Jika sudah ada data absensi
                     long idAbsensi = rsAbsensi.getLong("id_absensi");
                     String status = rsAbsensi.getString("status");
                     String keterangan = rsAbsensi.getString("keterangan");
-                    AbsensiSiswa absensi = new AbsensiSiswa(idAbsensi, idSiswa, tanggal, status, keterangan);
+                    AbsensiSiswa absensi = new AbsensiSiswa(idAbsensi, idSiswa, tanggal, status, keterangan, idMapel);
                     absensi.setNamaSiswa(namaSiswa);
+                    absensi.setNamaMataPelajaran(namaMapel);
                     tempAbsensi.add(absensi);
                 } else {
-                    // Jika belum ada data absensi, buat entri default "Hadir"
-                    AbsensiSiswa absensi = new AbsensiSiswa(-1, idSiswa, tanggal, "Hadir", ""); // id_absensi -1 menandakan baru
+                    AbsensiSiswa absensi = new AbsensiSiswa(-1, idSiswa, tanggal, "Hadir", "", idMapel);
                     absensi.setNamaSiswa(namaSiswa);
+                    absensi.setNamaMataPelajaran(namaMapel);
                     tempAbsensi.add(absensi);
                 }
             }
             absensiList.addAll(tempAbsensi);
-            absensiTableView.setDisable(false); // Aktifkan tabel
+            absensiTableView.setDisable(false);
         } catch (SQLException e) {
             showAlert(Alert.AlertType.ERROR, "Database Error", "Gagal memuat daftar absensi: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    private void saveAbsensiStatus(AbsensiSiswa absensi) {
+    private void saveAbsensiStatus(AbsensiSiswa absensi, long idKelas, long idMapel) {
         try (Connection c = MainDataSource.getConnection()) {
-            if (absensi.getId_absensi() == -1) { // Absensi baru, lakukan INSERT
-                String insertQuery = "INSERT INTO ABSENSI_SISWA (id_siswa, tanggal, status, keterangan) VALUES (?, ?, ?, ?)";
+            if (absensi.getId_absensi() == -1) {
+                String insertQuery = "INSERT INTO ABSENSI_SISWA (id_siswa, tanggal, status, keterangan, id_pelajaran) VALUES (?, ?, ?, ?, ?)";
                 PreparedStatement stmt = c.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
                 stmt.setLong(1, absensi.getId_siswa());
                 stmt.setDate(2, java.sql.Date.valueOf(absensi.getTanggal()));
                 stmt.setString(3, absensi.getStatus());
                 stmt.setString(4, absensi.getKeterangan());
+                stmt.setLong(5, idMapel);
                 stmt.executeUpdate();
 
                 ResultSet rs = stmt.getGeneratedKeys();
                 if (rs.next()) {
-                    absensi.setId_absensi(rs.getLong(1)); // Update id_absensi di DTO
+                    absensi.setId_absensi(rs.getLong(1));
                 }
-                showAlert(Alert.AlertType.INFORMATION, "Berhasil", "Absensi siswa " + absensi.getNamaSiswa() + " berhasil ditambahkan.");
-            } else { // Absensi sudah ada, lakukan UPDATE
-                String updateQuery = "UPDATE ABSENSI_SISWA SET status = ?, keterangan = ? WHERE id_absensi = ?";
+                showAlert(Alert.AlertType.INFORMATION, "Berhasil", "Absensi siswa " + absensi.getNamaSiswa() + " untuk " + absensi.getNamaMataPelajaran() + " berhasil ditambahkan.");
+            } else {
+                String updateQuery = "UPDATE ABSENSI_SISWA SET status = ?, keterangan = ? WHERE id_siswa = ? AND tanggal = ? AND id_pelajaran = ?";
                 PreparedStatement stmt = c.prepareStatement(updateQuery);
                 stmt.setString(1, absensi.getStatus());
                 stmt.setString(2, absensi.getKeterangan());
-                stmt.setLong(3, absensi.getId_absensi());
+                stmt.setLong(3, absensi.getId_siswa());
+                stmt.setDate(4, java.sql.Date.valueOf(absensi.getTanggal()));
+                stmt.setLong(5, idMapel);
                 stmt.executeUpdate();
-                showAlert(Alert.AlertType.INFORMATION, "Berhasil", "Absensi siswa " + absensi.getNamaSiswa() + " berhasil diperbarui.");
+                showAlert(Alert.AlertType.INFORMATION, "Berhasil", "Absensi siswa " + absensi.getNamaSiswa() + " untuk " + absensi.getNamaMataPelajaran() + " berhasil diperbarui.");
             }
         } catch (SQLIntegrityConstraintViolationException e) {
-            // Tangani UNIQUE constraint jika ada (id_siswa, tanggal)
-            showAlert(Alert.AlertType.ERROR, "Database Error", "Absensi untuk siswa " + absensi.getNamaSiswa() + " pada tanggal ini sudah ada. " + e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Database Error", "Absensi untuk siswa " + absensi.getNamaSiswa() + " pada tanggal ini dan mata pelajaran ini sudah ada. " + e.getMessage());
             e.printStackTrace();
         } catch (SQLException e) {
             showAlert(Alert.AlertType.ERROR, "Database Error", "Gagal menyimpan absensi: " + e.getMessage());
             e.printStackTrace();
         }
     }
+
 
     @FXML
     void onBackToGuruDashboardClick(ActionEvent event) {
@@ -316,13 +313,14 @@ public class GuruAbsensiController {
             FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("guru-view.fxml"));
             Parent root = loader.load();
             GuruController controller = loader.getController();
-            controller.setUser(currentUser); // Meneruskan objek user kembali
+            controller.setUser(currentUser);
             app.getPrimaryStage().setScene(new Scene(root));
         } catch (IOException e) {
             showAlert(Alert.AlertType.ERROR, "Error Navigasi", "Terjadi kesalahan saat kembali ke dashboard guru.");
             e.printStackTrace();
         }
     }
+
 
     private void showAlert(Alert.AlertType type, String title, String content) {
         Alert alert = new Alert(type);
