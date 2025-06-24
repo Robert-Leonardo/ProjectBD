@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
@@ -9,6 +10,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+
 
 <AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.bdsqltester.scenes.siswa.SiswaLihatNilaiController">
     <children>
@@ -24,13 +26,37 @@
                         <Font size="18.0" />
                     </font>
                 </Label>
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                    <children>
+                        <Label text="Filter Berdasarkan:">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                        </Label>
+                        <Label text="Semester:">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                        </Label>
+                        <ChoiceBox fx:id="filterSemesterChoiceBox" prefWidth="100.0" />
+                        <Label text="Tahun Ajaran:">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                        </Label>
+                        <ChoiceBox fx:id="filterTahunAjaranChoiceBox" prefWidth="150.0" />
+                    </children>
+                    <VBox.margin>
+                        <Insets top="10.0" />
+                    </VBox.margin>
+                </HBox>
                 <TableView fx:id="nilaiTableView" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                     <columns>
+                        <TableColumn fx:id="tahunAjaranColumn" prefWidth="120.0" text="Tahun Ajaran" />
+                        <TableColumn fx:id="semesterColumn" prefWidth="80.0" text="Semester" />
                         <TableColumn fx:id="mapelColumn" prefWidth="200.0" text="Mata Pelajaran" />
                         <TableColumn fx:id="jenisUjianColumn" prefWidth="120.0" text="Jenis Ujian" />
                         <TableColumn fx:id="nilaiColumn" prefWidth="80.0" text="Nilai" />
-                        <TableColumn fx:id="semesterColumn" prefWidth="80.0" text="Semester" />
-                        <TableColumn fx:id="tahunAjaranColumn" prefWidth="120.0" text="Tahun Ajaran" />
                         <TableColumn fx:id="tanggalInputColumn" prefWidth="120.0" text="Tanggal Input" />
                     </columns>
                     <columnResizePolicy>
