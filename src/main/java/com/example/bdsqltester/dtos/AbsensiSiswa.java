@@ -51,8 +51,8 @@ public class AbsensiSiswa {
     public LocalDate getTanggal() { return tanggal; }
     public String getStatus() { return status; }
     public String getKeterangan() { return keterangan; }
-    public long getId_pelajaran() { return id_pelajaran; } // MENAMBAHKAN GETTER
-    public String getNamaMataPelajaran() { return namaMataPelajaran; } // MENAMBAHKAN GETTER
+    public long getId_pelajaran() { return id_pelajaran; }
+    public String getNamaMataPelajaran() { return namaMataPelajaran; }
 
     public void setId_absensi(long id_absensi) { this.id_absensi = id_absensi; }
     public void setId_siswa(long id_siswa) { this.id_siswa = id_siswa; }
