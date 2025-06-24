@@ -107,8 +107,19 @@ public class GuruController {
 
     @FXML
     void onLihatAbsensiClick(ActionEvent event) {
-        showAlert(Alert.AlertType.INFORMATION, "Fitur Belum Tersedia", "Fitur melihat absensi siswa akan segera hadir!");
-        // TODO: Implementasi navigasi ke halaman absensi guru
+        try {
+            HelloApplication app = HelloApplication.getApplicationInstance();
+            app.getPrimaryStage().setTitle("Manajemen Absensi Siswa"); // Judul baru
+
+            FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("guruAbsensi-view.fxml"));
+            Parent root = loader.load();
+            GuruAbsensiController controller = loader.getController();
+            controller.setUser(currentUser); // Teruskan objek user ke controller absensi
+            app.getPrimaryStage().setScene(new Scene(root));
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Error Loading Absensi", "Tidak dapat memuat tampilan absensi: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     @FXML
