@@ -192,7 +192,7 @@ public class WaliKelasController {
             showAlert(Alert.AlertType.WARNING, "Pilih Siswa", "Pilih siswa terlebih dahulu untuk mencetak rapor.");
             return;
         }
-        showAlert(Alert.AlertType.INFORMATION, "Fitur Cetak Rapor", "Rapor dicetak !");
+        showAlert(Alert.AlertType.INFORMATION, "Cetak Rapor", "Rapor dicetak !");
     }
 
     @FXML
